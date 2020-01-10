@@ -21,4 +21,4 @@ void conversion() {
 	printf("%g p = %g cm\n", pc, cm);
 }
 
-int main(char *argv, int argc) { conversion(); }
+int main() { conversion(); }

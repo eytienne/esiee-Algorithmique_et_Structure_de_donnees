@@ -8,7 +8,7 @@ const float CMPERINCH = 2.54;
 /* coucou */
 int toupper(int c) { return c >= 'a' && c <= 'z' ? c - 32 : c; }
 
-int main(char *argv, int argc) {
+int main() {
 	char *prompted = (char *)malloc(MAX_CHAR);
 	scanf("%s", prompted);
 	char current;
