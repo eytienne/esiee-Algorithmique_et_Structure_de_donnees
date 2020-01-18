@@ -23,13 +23,13 @@ void create(Vector *v);
 
 void destroy(Vector *v);
 
-int size(Vector v);
+int size(const Vector *v);
 
-int capacity(Vector v);
+int capacity(const Vector *v);
 
-void *get(Vector v, int index);
+void *get(const Vector *v, int index);
 
-Cell getCell(Vector v, int index);
+Cell getCell(const Vector *v, int index);
 
 int add(Vector *v, void *const element, size_t size);
 

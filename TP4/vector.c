@@ -30,20 +30,20 @@ void destroy(Vector *v) {
 	v->size = 0;
 }
 
-int size(Vector v) { return v.size; }
+int size(const Vector *v) { return v->size; }
 
-int capacity(Vector v) { return v.capacity; }
+int capacity(const Vector *v) { return v->capacity; }
 
-void *get(Vector v, int index) { return getCell(v, index).value; }
+void *get(const Vector *v, int index) { return getCell(v, index).value; }
 
-Cell getCell(Vector v, int index) {
-	assert(index >= 0 && index < v.size);
-	return v.values[index];
+Cell getCell(const Vector *v, int index) {
+	assert(index >= 0 && index < v->size);
+	return v->values[index];
 }
 
 int add(Vector *v, void *const element, size_t s) {
 	assert(v != NULL);
-	return insert(v, size(*v), element, s);
+	return insert(v, v->size, element, s);
 }
 
 int insert(Vector *v, int index, void *const element, size_t s) {
