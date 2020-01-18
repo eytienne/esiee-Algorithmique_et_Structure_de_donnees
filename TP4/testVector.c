@@ -75,7 +75,7 @@ int test() {
 	set(v, 0, &a, sizeof(a));
 	assert(*(int *)get(v, 0) == 10);
 	printVector(v);
-	
+
 	free(v);
 	v = NULL;
 
@@ -86,16 +86,21 @@ int test() {
 int demo() {
 	Vector *v = (Vector *)malloc(sizeof(Vector));
 	create(v);
+
 	int i = 35;
 	add(v, &i, sizeof(int));
+
 	char *cc = "c";
 	add(v, cc, sizeof(char));
 	printVectorWithChars(v);
+
 	char *cc2 = "wesh";
 	set(v, 1, cc2, sizeof(char));
 	printVectorWithChars(v);
+
 	free(v);
 	v = NULL;
+
 	return 0;
 }
 
