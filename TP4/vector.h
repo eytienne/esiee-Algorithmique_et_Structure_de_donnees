@@ -1,14 +1,21 @@
 #ifndef VECTOR_H
 #define VECTOR_H
+#include <stdlib.h>
+
+struct Cell {
+	void *value;
+	size_t size;
+};
+typedef struct Cell Cell;
 
 struct Vector {
-	int *values;
+	Cell *values;
 	int size;
 	int capacity;
 	int increment;
 };
-
 typedef struct Vector Vector;
+
 
 void create_expert(Vector *v, int capacity, int increment);
 
@@ -20,15 +27,17 @@ int size(Vector v);
 
 int capacity(Vector v);
 
-int get(Vector v, int index);
+void *get(Vector v, int index);
 
-void add(Vector *v, int element);
+Cell getCell(Vector v, int index);
 
-int insert(Vector *v, int index, int element);
+int add(Vector *v, void *const element, size_t size);
 
-void set(Vector *v, int index, int element);
+int insert(Vector *v, int index, void *const element, size_t size);
 
-int removeFromVectorAtIndex(Vector *v, int index);
+void set(Vector *v, int index, void *const element, size_t size);
+
+void *removeFromVectorAtIndex(Vector *v, int index);
 
 int delete (Vector *v, int start, int end);
 
