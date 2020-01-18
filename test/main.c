@@ -13,11 +13,13 @@ typedef struct Cell Cell;
 Cell *getCell(void *const value, size_t size);
 
 int main(int argc, char const *argv[]) {
-	int a = 3;
-	Cell *c = getCell(&a, sizeof(a));
-	printf("%d\n", *(int *)c->value);
-	a = 5;
-	printf("%d\n", *(int *)c->value);
+	int i = 3;
+	int j = 5;
+	const int *ptr;
+	ptr = &i;
+	printf("%d\n", *ptr);
+	ptr = &j;
+	printf("%d\n", *ptr);
 	return 0;
 }
 

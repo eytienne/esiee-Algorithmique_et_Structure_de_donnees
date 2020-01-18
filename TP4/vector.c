@@ -4,61 +4,99 @@
 #include <stdlib.h>
 #include <string.h>
 
-// private method
-int changeCapactity(Vector *v, size_t newCapacity);
+// public methods
+void destroy(Vector *v);
 
-void create_expert(Vector *v, int capacity, int increment) {
-	assert(v != NULL);
+int size(const Vector *v);
+
+int capacity(const Vector *v);
+
+void *get(const Vector *v, int index);
+
+Cell getCell(const Vector *v, int index);
+
+int add(Vector *v, void *const element, size_t size);
+
+int insert(Vector *v, int index, void *const element, size_t size);
+
+void set(Vector *v, int index, void *const element, size_t size);
+
+void *removeFromVectorAtIndex(Vector *v, int index);
+
+int delete (Vector *v, int start, int end);
+
+int adjust(Vector *v);
+
+// private method
+int changeCapactity(Vector *v, int newCapacity);
+
+Vector *create_expert(int cap, int inc) {
+	Vector *v = (Vector *)malloc(sizeof(Vector));
+
+	// setting public methods
+	v->destroy = destroy;
+	v->size = size;
 	v->capacity = capacity;
-	v->values = (Cell *)malloc(v->capacity * sizeof(Cell));
-	v->size = 0;
-	v->increment = increment;
+	v->get = get;
+	v->getCell = getCell;
+	v->add = add;
+	v->insert = insert;
+	v->set = set;
+	v->remove = removeFromVectorAtIndex;
+	v->delete = delete;
+	v->adjust = adjust;
+
+	v->__capacity__ = cap;
+	v->values = (Cell *)malloc(v->capacity(v) * sizeof(Cell));
+	v->__size__ = 0;
+	v->__increment__ = inc;
+	return v;
 }
 
-void create(Vector *v) { create_expert(v, 10, 3); }
+Vector *create() { return create_expert(10, 3); }
 
 void destroy(Vector *v) {
 	assert(v != NULL);
-	for (int i = 0; i < v->size; i++) {
+	for (int i = 0; i < v->size(v); i++) {
 		free(v->values[i].value);
 		v->values[i].size = 0;
 		free(&v->values[i]);
 	}
 	free(v->values);
 	v->values = NULL;
-	v->capacity = 0;
-	v->size = 0;
+	v->__capacity__ = 0;
+	v->__size__ = 0;
 }
 
-int size(Vector v) { return v.size; }
+int size(const Vector *v) { return v->__size__; }
 
-int capacity(Vector v) { return v.capacity; }
+int capacity(const Vector *v) { return v->__capacity__; }
 
-void *get(Vector v, int index) { return getCell(v, index).value; }
+void *get(const Vector *v, int index) { return getCell(v, index).value; }
 
-Cell getCell(Vector v, int index) {
-	assert(index >= 0 && index < v.size);
-	return v.values[index];
+Cell getCell(const Vector *v, int index) {
+	assert(index >= 0 && index < v->size(v));
+	return v->values[index];
 }
 
 int add(Vector *v, void *const element, size_t s) {
 	assert(v != NULL);
-	return insert(v, size(*v), element, s);
+	return insert(v, v->size(v), element, s);
 }
 
 int insert(Vector *v, int index, void *const element, size_t s) {
 	assert(v != NULL);
 	assert(index >= 0);
 
-	if (v->size + 1 > v->capacity) {
-		int newCapacity = v->capacity + v->increment;
+	if (v->size(v) + 1 > v->capacity(v)) {
+		int newCapacity = v->capacity(v) + v->__increment__;
 		int failed = changeCapactity(v, newCapacity);
 		if (failed)
 			return failed;
 	}
 
-	if (index < v->size) {
-		for (int i = v->size; i < index; i--)
+	if (index < v->size(v)) {
+		for (int i = v->size(v); i < index; i--)
 			v->values[i] = v->values[i - 1];
 	}
 
@@ -73,35 +111,35 @@ int insert(Vector *v, int index, void *const element, size_t s) {
 	newCell->size = s;
 	v->values[index] = *newCell;
 
-	v->size++;
+	v->__size__++;
 	return 0;
 }
 
 void set(Vector *v, int index, void *const element, size_t s) {
 	assert(v != NULL);
-	assert(index >= 0 && index < v->size);
+	assert(index >= 0 && index < v->size(v));
 	v->values[index].value = element;
 	v->values[index].size = s;
 }
 
 void *removeFromVectorAtIndex(Vector *v, int index) {
 	assert(v != NULL);
-	assert(index >= 0 && index < v->size);
+	assert(index >= 0 && index < v->size(v));
 	Cell removed = v->values[index];
-	// void *removedValue = malloc(v->values[index].size);
 	delete (v, index, index + 1);
 	return removed.value;
 }
 
 int delete (Vector *v, int start, int end) {
 	assert(v != NULL);
-	assert(start >= 0 && start < v->size && start < end);
+	assert(start >= 0 && start < v->size(v) && start < end);
 	for (int i = start; i < end; i++)
 		v->values[i] = v->values[i + 1];
-	v->size -= (end - start);
-	int newCapacity =
-		v->capacity - (v->capacity - v->size) / v->increment * v->increment;
-	if (newCapacity < v->capacity) {
+	v->__size__ -= (end - start);
+	size_t newCapacity = v->capacity(v) - (v->capacity(v) - v->size(v)) /
+											  v->__increment__ *
+											  v->__increment__;
+	if (newCapacity < v->capacity(v)) {
 		int failed = changeCapactity(v, newCapacity);
 		if (failed)
 			return failed;
@@ -111,16 +149,16 @@ int delete (Vector *v, int start, int end) {
 
 int adjust(Vector *v) {
 	assert(v != NULL);
-	if (v->size < v->capacity)
-		return changeCapactity(v, v->size);
+	if (size(v) < v->capacity(v))
+		return changeCapactity(v, v->size(v));
 	return 0;
 }
 
-int changeCapactity(Vector *v, size_t newCapacity) {
+int changeCapactity(Vector *v, int newCapacity) {
 	Cell *newValues = (Cell *)realloc(v->values, newCapacity * sizeof(Cell));
 	if (newValues == NULL)
 		return EXIT_FAILURE;
 	v->values = newValues;
-	v->capacity = newCapacity;
+	v->__capacity__ = newCapacity;
 	return EXIT_SUCCESS;
 }
