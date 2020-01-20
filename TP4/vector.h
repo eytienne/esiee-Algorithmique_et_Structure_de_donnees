@@ -16,7 +16,6 @@ struct Vector {
 };
 typedef struct Vector Vector;
 
-
 void create_expert(Vector *v, int capacity, int increment);
 
 void create(Vector *v);
@@ -29,7 +28,7 @@ int capacity(const Vector *v);
 
 void *get(const Vector *v, int index);
 
-Cell getCell(const Vector *v, int index);
+Cell *getCell(const Vector *v, int index);
 
 int add(Vector *v, void *const element, size_t size);
 

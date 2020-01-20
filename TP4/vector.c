@@ -34,11 +34,20 @@ int size(const Vector *v) { return v->size; }
 
 int capacity(const Vector *v) { return v->capacity; }
 
-void *get(const Vector *v, int index) { return getCell(v, index).value; }
+void *get(const Vector *v, int index) { return getCell(v, index)->value; }
 
-Cell getCell(const Vector *v, int index) {
+Cell *getCell(const Vector *v, int index) {
 	assert(index >= 0 && index < v->size);
-	return v->values[index];
+	Cell cToCopy = v->values[index];
+	Cell *returned = (Cell *)malloc(sizeof(Cell));
+	returned->value = malloc(cToCopy.size);
+	if (cToCopy.size == 1) {
+		strcpy(returned->value, cToCopy.value);
+	} else {
+		memcpy(returned->value, cToCopy.value, cToCopy.size);
+	}
+	returned->size = cToCopy.size;
+	return returned;
 }
 
 int add(Vector *v, void *const element, size_t s) {
@@ -69,7 +78,6 @@ int insert(Vector *v, int index, void *const element, size_t s) {
 	} else {
 		memcpy(newCell->value, element, s);
 	}
-
 	newCell->size = s;
 	v->values[index] = *newCell;
 
@@ -96,9 +104,15 @@ void *removeFromVectorAtIndex(Vector *v, int index) {
 int delete (Vector *v, int start, int end) {
 	assert(v != NULL);
 	assert(start >= 0 && start < v->size && start < end);
-	for (int i = start; i < end; i++)
-		v->values[i] = v->values[i + 1];
-	v->size -= (end - start);
+
+	int nbRemoved = (end - start);
+	int i = start;
+	for (; i < start + nbRemoved, i + nbRemoved < v->size; i++)
+		v->values[i] = v->values[i + nbRemoved];
+	for (; i < v->size; i++)
+		v->values[0];
+
+	v->size -= nbRemoved;
 	int newCapacity =
 		v->capacity - (v->capacity - v->size) / v->increment * v->increment;
 	if (newCapacity < v->capacity) {

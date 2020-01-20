@@ -19,24 +19,24 @@ int test() {
 	Vector *v = (Vector *)malloc(sizeof(Vector));
 
 	create(v);
+	printVector(v);
 	assert(v->values != NULL);
 	assert(capacity(v) == 10);
 	assert(size(v) == 0);
 	assert(v->increment == 3);
-	printVector(v);
 
 	destroy(v);
+	printVector(v);
 	assert(v->values == NULL);
 	assert(capacity(v) == 0);
 	assert(size(v) == 0);
-	printVector(v);
 
 	create_expert(v, 5, 4);
+	printVector(v);
 	assert(v->values != NULL);
 	assert(capacity(v) == 5);
 	assert(size(v) == 0);
 	assert(v->increment == 4);
-	printVector(v);
 
 	for (int i = 1; i <= 5; i++)
 		add(v, &i, sizeof(i));
@@ -45,17 +45,17 @@ int test() {
 	assert(size(v) == 5);
 	assert(capacity(v) == 5);
 
-	delete (v, size(v) - 3, size(v));
-	assert(*(int *)get(v, size(v) - 1) == 2);
+	delete (v, 0, 3);
+	printVector(v);
 	assert(size(v) == 2);
 	assert(capacity(v) == 5);
-	printVector(v);
 
-	removeFromVectorAtIndex(v, size(v) - 1);
-	assert(*(int *)get(v, size(v) - 1) == 1);
+	int removed = *(int *)removeFromVectorAtIndex(v, size(v) - 1);
+	printVector(v);
+	assert(*(int *)get(v, size(v) - 1) == 4);
+	assert(removed == 5);
 	assert(size(v) == 1);
 	assert(capacity(v) == 1);
-	printVector(v);
 
 	int a = 11;
 	int b = 11;
@@ -63,18 +63,26 @@ int test() {
 	add(v, &a, sizeof(a));
 	add(v, &b, sizeof(b));
 	add(v, &c, sizeof(c));
+	printVector(v);
 	assert(size(v) == 4);
 	assert(capacity(v) == 5);
-	printVector(v);
+
 	adjust(v);
+	printVector(v);
 	assert(size(v) == 4);
 	assert(capacity(v) == 4);
-	printVector(v);
 
 	a = 10;
 	set(v, 0, &a, sizeof(a));
-	assert(*(int *)get(v, 0) == 10);
 	printVector(v);
+	assert(*(int *)get(v, 0) == 10);
+
+	int *getRef = (int *)get(v, 0);
+	assert(*getRef == 10);
+	*getRef = 7;
+	printVector(v);
+	getRef = (int *)get(v, 0);
+	assert(*getRef == 10);
 
 	free(v);
 	v = NULL;
@@ -113,19 +121,19 @@ void printVector(Vector *v) {
 void printVectorWithChars(Vector *v) {
 	printf("Vector (size : %d, capacity : %d): \n", v->size, v->capacity);
 	for (int i = 0; i < size(v); i++) {
-		Cell c = getCell(v, i);
-		switch (c.size) {
+		Cell *c = getCell(v, i);
+		switch (c->size) {
 		case 1:
-			printf("%s\n", (char *)c.value);
+			printf("%s\n", (char *)c->value);
 			break;
 		case 2:
-			printf("%hd\n", *(short *)c.value);
+			printf("%hd\n", *(short *)c->value);
 			break;
 		case 4:
-			printf("%d\n", *(int *)c.value);
+			printf("%d\n", *(int *)c->value);
 			break;
 		case 8:
-			printf("%ld\n", *(long *)c.value);
+			printf("%ld\n", *(long *)c->value);
 			break;
 		default:
 			fprintf(stderr, "Value cannot be printed!");
