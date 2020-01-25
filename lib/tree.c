@@ -1,10 +1,11 @@
 #include "tree.h"
 #include <assert.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
-int __verifie(Tree *t, void *buffer);
+int __affiche_arbre(Tree *t, void *first);
+int __verifie(Tree *t, void *lastNodeValue);
 int __tri(Tree *t, void *si);
 
 Tree *cree_arbre(int value, Tree *left, Tree *right) {
@@ -29,7 +30,13 @@ int nombre_de_noeuds(const Tree *t) {
 	return 1 + nombre_de_noeuds(t->left) + nombre_de_noeuds(t->right);
 }
 
-int affiche_arbre(Tree *t, void *first) {
+void affiche_arbre(Tree *t) {
+	int first = 1;
+	walk(t, INFIXE, __affiche_arbre, &first);
+	printf("\n");
+}
+
+int __affiche_arbre(Tree *t, void *first) {
 	if (t == NULL)
 		return 2;
 	if (!*(int *)first)
@@ -116,17 +123,17 @@ int isLeaf(const Tree *t) {
 	return t->left == NULL && t->right == NULL;
 }
 
-int verifie(Tree *t){
+int verifie(Tree *t) {
 	int buffer = INT_MIN;
-	t->value = 0;
 	int badWalk = walk(t, INFIXE, __verifie, &buffer);
 	return badWalk;
 }
 
-int __verifie(Tree *t, void *buffer) {
-	if (t->value < *(int *)buffer)
+int __verifie(Tree *t, void *lastNodeValue) {
+	int *lnv = (int *)lastNodeValue;
+	if (t->value < *lnv)
 		return ISNOTBST;
-	*(int *)buffer = t->value;
+	*lnv = t->value;
 	return ISBST;
 }
 
@@ -138,13 +145,21 @@ typedef struct SortInfo {
 int *tri(int *src, int n) {
 	if (n <= 0)
 		return NULL;
+
 	SortInfo *si = (SortInfo *)malloc(sizeof(SortInfo));
+	si->dest = NULL;
+	si->size = 0;
+
 	Tree *t = cree_arbre(src[0], NULL, NULL);
 	for (int i = 0; i < n; i++)
 		insere(t, i);
+	affiche_arbre2(t);
+	printf("\n");
+
 	int failed = walk(t, INFIXE, __tri, si);
 	if (failed)
 		return NULL;
+
 	return si->dest;
 }
 

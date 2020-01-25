@@ -26,7 +26,7 @@ void detruit_arbre(Tree *t);
 
 int nombre_de_noeuds(const Tree *t);
 
-int affiche_arbre(Tree *t, void *first);
+void affiche_arbre(Tree *t);
 
 void affiche_arbre2(const Tree *t);
 

@@ -12,19 +12,19 @@ int main(int argc, char const *argv[]) {
 	insere(t, 9);
 	insere(t, 7);
 
-	int first = 1;
-	walk(t, INFIXE, affiche_arbre, &first);
-	printf("\n");
+	affiche_arbre(t);
 
 	t->value = 0;
 	int badWalk = verifie(t);
-	assert(!badWalk);
+	assert(badWalk);
+
+	// affiche_arbre2(t);
 
 	t->value = 4;
 	badWalk = verifie(t);
-	assert(badWalk);
+	assert(!badWalk);
 
-	int sortThis[5] = {10, -1, 4, 8, 2};
+	int sortThis[5] = {10, (-1), 4, 8, 2};
 	int *sorted = tri(sortThis, 5);
 	for (size_t i = 0; i < 5; i++)
 		printf("%d,", sorted[i]);
