@@ -1,12 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
-#include <stdlib.h>
 
-struct Cell {
-	void *value;
-	size_t size;
-};
-typedef struct Cell Cell;
+#include "cell.h"
 
 struct Vector {
 	Cell *values;

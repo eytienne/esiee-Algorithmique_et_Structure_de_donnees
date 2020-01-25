@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "pile.h"
+#include "../../lib/pile.h"
 
 int main()
 {
