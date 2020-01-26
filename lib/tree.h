@@ -26,7 +26,7 @@ void detruit_arbre(Tree *t);
 
 int nombre_de_noeuds(const Tree *t);
 
-void affiche_arbre(Tree *t);
+void affiche_arbre(const Tree *t);
 
 void affiche_arbre2(const Tree *t);
 
@@ -34,8 +34,8 @@ void insere(Tree *t, int value);
 
 Tree *trouve_noeud(Tree *t, int value);
 
-int walk(Tree *t, enum PATHWAY p, int (*function)(Tree *, void *buffer),
-		 void *buffer);
+int walk(const Tree *t, enum PATHWAY p,
+		 int (*function)(const Tree *, void *buffer), void *buffer);
 
 int isLeaf(const Tree *t);
 

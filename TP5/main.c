@@ -12,13 +12,16 @@ int main(int argc, char const *argv[]) {
 	insere(t, 9);
 	insere(t, 7);
 
+	printf("Nb noeuds : %d\n", nombre_de_noeuds(t));
 	affiche_arbre(t);
+	affiche_arbre2(t);
+
+	assert(trouve_noeud(t, 6) != NULL);
+	assert(trouve_noeud(t, 8) == NULL);
 
 	t->value = 0;
 	int badWalk = verifie(t);
 	assert(badWalk);
-
-	// affiche_arbre2(t);
 
 	t->value = 4;
 	badWalk = verifie(t);
@@ -29,6 +32,8 @@ int main(int argc, char const *argv[]) {
 	for (size_t i = 0; i < 5; i++)
 		printf("%d,", sorted[i]);
 	printf("\n");
+
+	
 
 	return 0;
 }

@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int __affiche_arbre(Tree *t, void *first);
-int __verifie(Tree *t, void *lastNodeValue);
-int __tri(Tree *t, void *si);
+int __nombre_de_noeuds(const Tree *t, void *counter);
+int __affiche_arbre(const Tree *t, void *first);
+int __verifie(const Tree *t, void *lastNodeValue);
+int __tri(const Tree *t, void *si);
 
 Tree *cree_arbre(int value, Tree *left, Tree *right) {
 	Tree *t = (Tree *)malloc(sizeof(Tree));
@@ -25,68 +26,80 @@ void detruit_arbre(Tree *t) {
 }
 
 int nombre_de_noeuds(const Tree *t) {
-	if (t == NULL)
-		return 0;
-	return 1 + nombre_de_noeuds(t->left) + nombre_de_noeuds(t->right);
+	int counter = 0;
+	walk(t, INFIXE, __nombre_de_noeuds, &counter);
+	return counter;
 }
 
-void affiche_arbre(Tree *t) {
+int __nombre_de_noeuds(const Tree *t, void *counter) {
+	++*(int *)counter;
+	return WALK_SUCCESS;
+}
+
+void affiche_arbre(const Tree *t) {
 	int first = 1;
 	walk(t, INFIXE, __affiche_arbre, &first);
 	printf("\n");
 }
 
-int __affiche_arbre(Tree *t, void *first) {
+int __affiche_arbre(const Tree *t, void *first) {
 	if (t == NULL)
-		return 2;
+		return WALK_SUCCESS;
 	if (!*(int *)first)
 		printf("\t");
 	printf("%d", t->value);
 	if (*(int *)first)
 		*(int *)first = 0;
-	return 0;
+	return WALK_SUCCESS;
 }
 
-void affiche_arbre2(const Tree *t) {
+void __affiche_arbre2(const Tree *t) {
 	if (t == NULL) {
 		printf("_");
 		return;
 	}
 	printf("{");
-	affiche_arbre2(t->left);
+	__affiche_arbre2(t->left);
 	printf(",%d,", t->value);
-	affiche_arbre2(t->right);
+	__affiche_arbre2(t->right);
 	printf("}");
 }
 
-void insere(Tree *t, int value) {
-	if (value > t->value)
-		if (t->right == NULL)
-			t->right = cree_arbre(value, NULL, NULL);
-		else
-			insere(t->right, value);
-	else if (value < t->value)
-		if (t->left == NULL)
-			t->left = cree_arbre(value, NULL, NULL);
-		else
-			insere(t->left, value);
+void affiche_arbre2(const Tree *t) {
+	__affiche_arbre2(t);
+	printf("\n");
 }
 
-Tree *trouve_noeud(Tree *t, int value) {
-	if (t == NULL)
-		return NULL;
-	if (t->value == value)
-		return t;
-	else {
+void insere(Tree *t, int value) {
+	while (1) {
 		if (value > t->value)
-			return trouve_noeud(t->right, value);
-		else
-			return trouve_noeud(t->left, value);
+			if (t->right == NULL) {
+				t->right = cree_arbre(value, NULL, NULL);
+				return;
+			} else
+				t = t->right;
+		else if (value <= t->value)
+			if (t->left == NULL) {
+				t->left = cree_arbre(value, NULL, NULL);
+				return;
+			} else
+				t = t->left;
 	}
 }
 
-int walk(Tree *t, enum PATHWAY p, int (*function)(Tree *, void *buffer),
-		 void *buffer) {
+Tree *trouve_noeud(Tree *t, int value) {
+	while (t != NULL)
+		if (value == t->value)
+			return t;
+		else if (value > t->value)
+			t = t->right;
+		else
+			t = t->left;
+	return NULL;
+}
+
+int walk(const Tree *t, enum PATHWAY p,
+		 int (*function)(const Tree *, void *buffer), void *buffer) {
 	if (t == NULL)
 		return 0;
 	switch (p) {
@@ -126,10 +139,10 @@ int isLeaf(const Tree *t) {
 int verifie(Tree *t) {
 	int buffer = INT_MIN;
 	int badWalk = walk(t, INFIXE, __verifie, &buffer);
-	return badWalk;
+	return badWalk ? ISNOTBST : ISBST;
 }
 
-int __verifie(Tree *t, void *lastNodeValue) {
+int __verifie(const Tree *t, void *lastNodeValue) {
 	int *lnv = (int *)lastNodeValue;
 	if (t->value < *lnv)
 		return ISNOTBST;
@@ -139,37 +152,33 @@ int __verifie(Tree *t, void *lastNodeValue) {
 
 typedef struct SortInfo {
 	int *dest;
-	size_t size;
+	int index;
 } SortInfo;
 
 int *tri(int *src, int n) {
 	if (n <= 0)
 		return NULL;
 
-	SortInfo *si = (SortInfo *)malloc(sizeof(SortInfo));
-	si->dest = NULL;
-	si->size = 0;
-
 	Tree *t = cree_arbre(src[0], NULL, NULL);
 	for (int i = 0; i < n; i++)
-		insere(t, i);
-	affiche_arbre2(t);
-	printf("\n");
+		insere(t, src[i]);
 
+	SortInfo *si = (SortInfo *)malloc(sizeof(SortInfo));
+	si->dest = calloc(n, sizeof(int));
+	si->index = 0;
 	int failed = walk(t, INFIXE, __tri, si);
-	if (failed)
+	int *ret = si->dest;
+	free(si);
+	if (failed) {
+		free(ret);
 		return NULL;
-
-	return si->dest;
+	}
+	return ret;
 }
 
-int __tri(Tree *t, void *si) {
+int __tri(const Tree *t, void *si) {
 	SortInfo *csi = (SortInfo *)si;
-	int *newDest = (int *)realloc(csi->dest, csi->size + sizeof(int));
-	if (newDest == NULL)
-		return WALK_FAILURE;
-	newDest[csi->size] = t->value;
-	csi->dest = newDest;
-	csi->size++;
+	csi->dest[csi->index] = t->value;
+	csi->index++;
 	return WALK_SUCCESS;
 }
