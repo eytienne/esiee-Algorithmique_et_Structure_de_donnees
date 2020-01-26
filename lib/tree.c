@@ -4,10 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef Tree **SonParentDuet;
+SonParentDuet newSonParentDuet();
+
 int __nombre_de_noeuds(const Tree *t, void *counter);
 int __affiche_arbre(const Tree *t, void *first);
+SonParentDuet findNodeWithParent(Tree *t, int value);
 int __verifie(const Tree *t, void *lastNodeValue);
 int __tri(const Tree *t, void *si);
+void cutTree(Tree *toCut, Tree *from);
+int minValue(const Tree *t);
+Tree *minNode(Tree *t);
+SonParentDuet minNodeWithParent(Tree *t);
 
 Tree *cree_arbre(int value, Tree *left, Tree *right) {
 	Tree *t = (Tree *)malloc(sizeof(Tree));
@@ -88,14 +96,25 @@ void insere(Tree *t, int value) {
 }
 
 Tree *trouve_noeud(Tree *t, int value) {
-	while (t != NULL)
-		if (value == t->value)
-			return t;
-		else if (value > t->value)
+	SonParentDuet twp = findNodeWithParent(t, value);
+	Tree *ret = twp[0];
+	free(twp);
+	return ret;
+}
+
+SonParentDuet findNodeWithParent(Tree *t, int value) {
+	SonParentDuet twp = newSonParentDuet();
+	while (t != NULL) {
+		if (value == t->value) {
+			twp[0] = t;
+			break;
+		} else if (value > t->value)
 			t = t->right;
 		else
 			t = t->left;
-	return NULL;
+		twp[1] = t;
+	}
+	return twp;
 }
 
 int walk(const Tree *t, enum PATHWAY p,
@@ -163,12 +182,11 @@ int *tri(int *src, int n) {
 	for (int i = 0; i < n; i++)
 		insere(t, src[i]);
 
-	SortInfo *si = (SortInfo *)malloc(sizeof(SortInfo));
-	si->dest = calloc(n, sizeof(int));
-	si->index = 0;
-	int failed = walk(t, INFIXE, __tri, si);
-	int *ret = si->dest;
-	free(si);
+	SortInfo si;
+	si.dest = calloc(n, sizeof(int));
+	si.index = 0;
+	int failed = walk(t, INFIXE, __tri, &si);
+	int *ret = si.dest;
 	if (failed) {
 		free(ret);
 		return NULL;
@@ -181,4 +199,63 @@ int __tri(const Tree *t, void *si) {
 	csi->dest[csi->index] = t->value;
 	csi->index++;
 	return WALK_SUCCESS;
+}
+
+void supprime(Tree **t, int value) {
+	SonParentDuet pair = findNodeWithParent(*t, value);
+	Tree *toRemove = pair[0], *parent = pair[1];
+	if (toRemove == NULL)
+		return;
+	Tree *newSon = NULL;
+	if (toRemove->left != NULL && toRemove->right != NULL) {
+		SonParentDuet spd = minNodeWithParent(toRemove->right);
+		// clean min removal
+		spd[1]->left = spd[0]->right;
+
+		newSon = spd[0];
+	} else if (toRemove->left == NULL ^ toRemove->right == NULL) {
+		newSon = toRemove->left != NULL ? toRemove->left : toRemove->right;
+	}
+	if (newSon != NULL) {
+		newSon->left = toRemove->left;
+		newSon->right = toRemove->right;
+	}
+	if (parent == NULL)
+		*t = newSon;
+	else {
+		if (parent->left == NULL)
+			parent->left = newSon;
+		else
+			parent->right = newSon;
+	}
+	free(toRemove);
+}
+
+void cutTree(Tree *toCut, Tree *from) {
+	if (from->left == toCut)
+		from->left = NULL;
+	else if (from->right == toCut)
+		from->right = NULL;
+}
+
+int minValue(const Tree *t) { return minNode(t)->value; }
+
+Tree *minNode(Tree *t) { return minNodeWithParent(t)[0]; }
+
+SonParentDuet minNodeWithParent(Tree *t) {
+	SonParentDuet spd = newSonParentDuet();
+	spd[0] = t;
+	while (t->left != NULL) {
+		spd[0] = t->left;
+		spd[1] = t;
+		t = t->left;
+	}
+	return spd;
+}
+
+SonParentDuet newSonParentDuet() {
+	Tree **twp = (Tree **)malloc(2 * sizeof(Tree *));
+	twp[0] = NULL; // son
+	twp[1] = NULL; // parent
+	return twp;
 }

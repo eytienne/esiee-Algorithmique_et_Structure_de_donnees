@@ -12,7 +12,9 @@ int main(int argc, char const *argv[]) {
 	insere(t, 9);
 	insere(t, 7);
 
-	printf("Nb noeuds : %d\n", nombre_de_noeuds(t));
+	int nb = nombre_de_noeuds(t);
+	printf("Nb noeuds : %d\n", nb);
+	assert(nb == 7);
 	affiche_arbre(t);
 	affiche_arbre2(t);
 
@@ -33,7 +35,12 @@ int main(int argc, char const *argv[]) {
 		printf("%d,", sorted[i]);
 	printf("\n");
 
-	
+	supprime(&t, 4);
+	assert(t->value == 6);
+	affiche_arbre2(t);
+	nb = nombre_de_noeuds(t);
+	printf("Nb noeuds : %d\n", nb);
+	assert(nb == 6);
 
 	return 0;
 }

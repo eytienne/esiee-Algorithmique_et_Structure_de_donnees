@@ -7,18 +7,12 @@ typedef struct Tree {
 	struct Tree *right;
 } Tree;
 
-typedef struct TreeWithParent {
-	struct TreeWithParent *parent;
-	Tree *current;
-
-} TreeWithParent;
-
 enum PATHWAY { INFIXE, PREFIXE, POSTFIXE };
 
-enum WALKCHECK { WALK_SUCCESS, WALK_FAILURE };
+enum WALK_CHECK { WALK_SUCCESS, WALK_FAILURE };
 
-#define ISBST WALK_SUCCESS
-#define ISNOTBST WALK_FAILURE
+enum BST_CHECK { ISBST = WALK_SUCCESS, ISNOTBST = WALK_FAILURE};
+
 
 Tree *cree_arbre(int value, Tree *left, Tree *right);
 
@@ -42,5 +36,7 @@ int isLeaf(const Tree *t);
 int verifie(Tree *t);
 
 int *tri(int *src, int n);
+
+void supprime(Tree **t, int value);
 
 #endif
