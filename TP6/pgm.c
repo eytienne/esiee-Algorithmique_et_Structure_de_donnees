@@ -99,7 +99,7 @@ int extractPGM(FILE *from, const char *to, int x, int y, int width,
 		} else {
 			if (blankFill == NULL) {
 				blankFill = calloc(width, 1);
-				if(blankFill == NULL)
+				if (blankFill == NULL)
 					return -3;
 			}
 			fwrite(blankFill, 1, width, toFile);
