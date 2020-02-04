@@ -21,7 +21,6 @@ int isEmpty(const LCA *lca) {
 
 int put(LCA *lca, Key k, Value v) {
 	assert(lca != NULL);
-
 	LCACell *cell = (LCACell *)malloc(sizeof(LCACell));
 	cell->key = malloc(sizeof(Key));
 	keycpy(cell->key, k);
@@ -31,4 +30,41 @@ int put(LCA *lca, Key k, Value v) {
 	lca->first = cell;
 }
 
-const __SDA__ SDAFunc = {new, isEmpty, put};
+int containsKey(const LCA *lca, Key k) {
+	assert(lca != NULL);
+	LCACell *current = lca->first;
+	while (current != NULL) {
+		if (keycmp(current->key, k) == 0)
+			return 1;
+		current = current->next;
+	}
+	return 0;
+}
+
+Value get(const LCA *lca, Key k) {
+	assert(lca != NULL);
+	LCACell *current = lca->first;
+	while (current != NULL) {
+		if (keycmp(current->key, k) == 0) {
+			Value ret = malloc(sizeof(Value));
+			return valcpy(ret, current->value);
+		}
+		current = current->next;
+	}
+	return NULL;
+}
+
+void clear(LCA *lca) {
+	assert(lca != NULL);
+	LCACell *current = lca->first;
+	while (current != NULL) {
+		LCACell *next = current->next;
+		free(current->key);
+		free(current->value);
+		free(current);
+		current = next;
+	}
+	lca->first = NULL;
+}
+
+const __SDA__ SDAFunc = {new, isEmpty, put, containsKey, get, clear};
