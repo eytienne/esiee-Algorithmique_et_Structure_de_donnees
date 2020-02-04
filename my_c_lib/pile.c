@@ -4,7 +4,6 @@
 
 #include "pile.h"
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 void initialiser(Pile *p) {
@@ -13,45 +12,54 @@ void initialiser(Pile *p) {
 	assert(est_vide(p));
 }
 
+Pile *newPile(){
+	Pile *oldTop = (Pile *)malloc(sizeof(Pile));
+	initialiser(oldTop);
+	return oldTop;
+}
+
 void detruire(Pile *p) {
 	assert(p != NULL);
 	while (!est_vide(p))
 		depiler(p);
 }
 
-char sommet(const Pile *p) {
+Cell *sommet(const Pile *p) {
 	assert(!est_vide(p));
-	return p->suivante->element;
+	Cell *top = malloc(sizeof(Cell));
+	cellcpy(top, p->element);
+	return top;
 }
 
 void depiler(Pile *p) {
 	assert(p != NULL);
 	assert(!est_vide(p));
+	freeCell(p->element);
 	*p = *(p->suivante);
 }
 
-void empiler(Pile *p, char v) {
+void empiler(Pile *p, const Cell *v) {
 	assert(p != NULL);
 	assert(!est_pleine(p));
 
-	Pile *newSommet = (Pile *)malloc(sizeof(Pile));
-	initialiser(newSommet);
-	newSommet->suivante = p;
+	Pile *oldTop = newPile();
+	assert(oldTop != NULL);
+	oldTop->element = p->element;
+	oldTop->suivante = p->suivante;	
 
-	p->element = v;
-	*p = *newSommet;
+	assert(cellcpy(p->element, v) != NULL);
+	p->suivante = oldTop;
 	
 	assert(sommet(p) == v);
 }
 
-bool est_vide(const Pile *p) { return p->suivante == NULL; }
+bool est_vide(const Pile *p) { return p->element == NULL; }
 
 bool est_pleine(const Pile *p) {
 	int length = 0;
-	while (p->suivante != NULL) {
+	while (p != NULL) {
 		p = p->suivante;
 		++length;
 	}
-
-	return length > PILE_CAPACITE;
+	return length >= PILE_CAPACITE;
 }

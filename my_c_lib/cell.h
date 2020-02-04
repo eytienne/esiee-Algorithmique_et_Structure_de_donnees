@@ -8,4 +8,8 @@ typedef struct Cell {
 	size_t size;
 } Cell;
 
+Cell *cellcpy(Cell *dest, const Cell *src);
+
+void freeCell(Cell *toFree);
+
 #endif

@@ -6,11 +6,12 @@
 #define PILE__H
 
 #include <stdbool.h>
+#include "cell.h"
 
 #define PILE_CAPACITE 10 /* Taille de la pile */
 
 typedef struct Pile {
-	char element;		   /* l'�l�ment de la cellule */
+	Cell *element;		   /* l'�l�ment de la cellule */
 	struct Pile *suivante; /* acc�s � la cellule suivante */
 } Pile;
 
@@ -23,6 +24,8 @@ void initialiser(Pile *p);
  * Assure :
  *	est_vide(*p);
  */
+
+Pile *newPile();
 
 void detruire(Pile *p);
 /* D�truire la pile.  Les ressources associ�es seront lib�r�es et la
@@ -47,7 +50,7 @@ void depiler(Pile *p);
  *	! est_vide(*p);
  */
 
-void empiler(Pile *p, char v);
+void empiler(Pile *p, const Cell *v);
 /* Ajouter l'�l�ment v en sommet de pile p.
  *
  * N�cessite :
