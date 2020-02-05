@@ -4,16 +4,17 @@
 #include "cell.h"
 
 struct Vector {
-	Cell *values;
+	void **values;
+	size_t sizeofEach;
 	int size;
 	int capacity;
 	int increment;
 };
 typedef struct Vector Vector;
 
-void create_expert(Vector *v, int capacity, int increment);
+void create_expert(Vector *v, int capacity, int increment, size_t sizeofEach);
 
-void create(Vector *v);
+void create(Vector *v, size_t sizeofEach);
 
 void destroy(Vector *v);
 
@@ -25,11 +26,11 @@ void *get(const Vector *v, int index);
 
 Cell *getCell(const Vector *v, int index);
 
-int add(Vector *v, void *const element, size_t size);
+int add(Vector *v, const void *element);
 
-int insert(Vector *v, int index, void *const element, size_t size);
+int insert(Vector *v, int index, const void *element);
 
-void set(Vector *v, int index, void *const element, size_t size);
+void set(Vector *v, int index, const void *element);
 
 void *removeFromVectorAtIndex(Vector *v, int index);
 
