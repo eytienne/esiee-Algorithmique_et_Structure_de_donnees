@@ -7,21 +7,22 @@
 // private method
 int changeCapactity(Vector *v, size_t newCapacity);
 
-void create_expert(Vector *v, int capacity, int increment) {
+void create_expert(Vector *v, int capacity, int increment, size_t sizeofEach) {
 	assert(v != NULL);
 	v->capacity = capacity;
-	v->values = (Cell *)malloc(v->capacity * sizeof(Cell));
+	v->sizeofEach = sizeofEach;
+	v->values = malloc(v->capacity * v->sizeofEach);
 	v->size = 0;
 	v->increment = increment;
 }
 
-void create(Vector *v) { create_expert(v, 10, 3); }
+void create(Vector *v, size_t sizeofEach) {
+	create_expert(v, 10, 3, sizeofEach);
+}
 
 void destroy(Vector *v) {
 	assert(v != NULL);
 	for (int i = 0; i < v->size; i++) {
-		free(v->values[i].value);
-		v->values[i].size = 0;
 		free(&v->values[i]);
 	}
 	free(v->values);
@@ -34,29 +35,29 @@ int size(const Vector *v) { return v->size; }
 
 int capacity(const Vector *v) { return v->capacity; }
 
-void *get(const Vector *v, int index) { return getCell(v, index)->value; }
-
-Cell *getCell(const Vector *v, int index) {
+void *get(const Vector *v, int index) {
 	assert(index >= 0 && index < v->size);
-	Cell cToCopy = v->values[index];
-	Cell *returned = (Cell *)malloc(sizeof(Cell));
-	returned->value = malloc(cToCopy.size);
-	if (cToCopy.size == 1) {
-		strcpy(returned->value, cToCopy.value);
-	} else {
-		memcpy(returned->value, cToCopy.value, cToCopy.size);
-	}
-	returned->size = cToCopy.size;
-	return returned;
+	int i = 0;
+	printf("step %d\n", i++);
+	if (v->values[index] == NULL)
+		return NULL;
+
+	printf("step %d\n", i++);
+	void *ret = malloc(v->sizeofEach);
+
+	printf("step %d (%p)\n", i++, v->values[index]);
+	memcpy(ret, v->values[index], v->sizeofEach);
+	return ret;
 }
 
-int add(Vector *v, void *const element, size_t s) {
+int add(Vector *v, const void *element) {
 	assert(v != NULL);
-	return insert(v, v->size, element, s);
+	return insert(v, v->size, element);
 }
 
-int insert(Vector *v, int index, void *const element, size_t s) {
+int insert(Vector *v, int index, const void *element) {
 	assert(v != NULL);
+	assert(element != NULL);
 	assert(index >= 0);
 
 	if (v->size + 1 > v->capacity) {
@@ -71,34 +72,26 @@ int insert(Vector *v, int index, void *const element, size_t s) {
 			v->values[i] = v->values[i - 1];
 	}
 
-	Cell *newCell = (Cell *)malloc(sizeof(Cell));
-	newCell->value = malloc(s);
-	if (s == 1) {
-		strcpy(newCell->value, element);
-	} else {
-		memcpy(newCell->value, element, s);
-	}
-	newCell->size = s;
-	v->values[index] = *newCell;
+	void *newOne = malloc(sizeof(v->sizeofEach));
+	memcpy(newOne, element, v->sizeofEach);
+	v->values[index] = newOne;
 
 	v->size++;
 	return 0;
 }
 
-void set(Vector *v, int index, void *const element, size_t s) {
+void set(Vector *v, int index, const void *element) {
 	assert(v != NULL);
+	assert(element != NULL);
 	assert(index >= 0 && index < v->size);
-	v->values[index].value = element;
-	v->values[index].size = s;
+	memcpy(v->values[index], element, v->sizeofEach);
 }
 
 void *removeFromVectorAtIndex(Vector *v, int index) {
 	assert(v != NULL);
-	assert(index >= 0 && index < v->size);
-	Cell removed = v->values[index];
-	// void *removedValue = malloc(v->values[index].size);
+	void *removed = get(v, index);
 	delete (v, index, index + 1);
-	return removed.value;
+	return removed;
 }
 
 int delete (Vector *v, int start, int end) {
@@ -131,7 +124,7 @@ int adjust(Vector *v) {
 }
 
 int changeCapactity(Vector *v, size_t newCapacity) {
-	Cell *newValues = (Cell *)realloc(v->values, newCapacity * sizeof(Cell));
+	void **newValues = realloc(v->values, newCapacity * v->sizeofEach);
 	if (newValues == NULL)
 		return EXIT_FAILURE;
 	v->values = newValues;
