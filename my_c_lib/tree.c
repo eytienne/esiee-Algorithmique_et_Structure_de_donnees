@@ -9,7 +9,9 @@ SonParentDuet newSonParentDuet();
 
 int __nombre_de_noeuds(const Tree *t, void *counter);
 int __affiche_arbre(const Tree *t, void *first);
-SonParentDuet findNodeWithParent(Tree *t, int value);
+SonParentDuet findNodeWithParent(Tree *t, const Cell *value,
+								 int (*cmpFunc)(const Cell *value,
+												const Cell *existing));
 int __verifie(const Tree *t, void *lastNodeValue);
 int __tri(const Tree *t, void *si);
 void cutTree(Tree *toCut, Tree *from);
@@ -17,9 +19,11 @@ int minValue(const Tree *t);
 Tree *minNode(Tree *t);
 SonParentDuet minNodeWithParent(Tree *t);
 
-Tree *cree_arbre(int value, Tree *left, Tree *right) {
+Tree *cree_arbre(const Cell *value, Tree *left, Tree *right) {
 	Tree *t = (Tree *)malloc(sizeof(Tree));
-	t->value = value;
+	Cell *initValue = malloc(sizeof(Cell));
+	cellcpy(initValue, value);
+	t->value = initValue;
 	t->left = left;
 	t->right = right;
 	return t;
@@ -78,37 +82,42 @@ void affiche_arbre2(const Tree *t) {
 	printf("\n");
 }
 
-void insere(Tree *t, int value) {
+void insere(Tree *t, const Cell *newValue,
+			int (*cmpFunc)(const Cell *newValue, const Cell *existing)) {
 	while (1) {
-		if (value > t->value)
+		if (cmpFunc(newValue, t->value) > 0)
 			if (t->right == NULL) {
-				t->right = cree_arbre(value, NULL, NULL);
+				t->right = cree_arbre(newValue, NULL, NULL);
 				return;
 			} else
 				t = t->right;
-		else if (value <= t->value)
+		else if (cmpFunc(newValue, t->value) <= 0)
 			if (t->left == NULL) {
-				t->left = cree_arbre(value, NULL, NULL);
+				t->left = cree_arbre(newValue, NULL, NULL);
 				return;
 			} else
 				t = t->left;
 	}
 }
 
-Tree *trouve_noeud(Tree *t, int value) {
-	SonParentDuet twp = findNodeWithParent(t, value);
+Tree *trouve_noeud(Tree *t, const Cell *value,
+				   int (*cmpFunc)(const Cell *value, const Cell *existing)) {
+	SonParentDuet twp = findNodeWithParent(t, value, cmpFunc);
 	Tree *ret = twp[0];
 	free(twp);
 	return ret;
 }
 
-SonParentDuet findNodeWithParent(Tree *t, int value) {
+SonParentDuet findNodeWithParent(Tree *t, const Cell *value,
+								 int (*cmpFunc)(const Cell *value,
+												const Cell *existing)) {
 	SonParentDuet twp = newSonParentDuet();
 	while (t != NULL) {
-		if (value == t->value) {
+		int cmp = cmpFunc(value, t->value);
+		if (cmp == 0) {
 			twp[0] = t;
 			break;
-		} else if (value > t->value)
+		} else if (cmp > 0)
 			t = t->right;
 		else
 			t = t->left;
@@ -155,22 +164,30 @@ int isLeaf(const Tree *t) {
 	return t->left == NULL && t->right == NULL;
 }
 
-int verifie(Tree *t) {
-	int buffer = INT_MIN;
-	int badWalk = walk(t, INFIXE, __verifie, &buffer);
+typedef struct CheckInfo {
+	Cell *lastCell;
+	int (*cmpFunc)(const Cell *value, const Cell *existing);
+} CheckInfo;
+
+int verifie(Tree *t, int (*cmpFunc)(const Cell *value, const Cell *existing)) {
+	CheckInfo ci;
+	ci.lastCell = NULL;
+	ci.cmpFunc = cmpFunc;
+	int badWalk = walk(t, INFIXE, __verifie, &ci);
 	return badWalk ? ISNOTBST : ISBST;
 }
 
-int __verifie(const Tree *t, void *lastNodeValue) {
-	int *lnv = (int *)lastNodeValue;
-	if (t->value < *lnv)
+int __verifie(const Tree *t, void *buffer) {
+	const CheckInfo *ci = (CheckInfo *)*buffer;
+	int cmp = ci->cmpFunc(t->value, ci->lastCell);
+	if (cmp < 0)
 		return ISNOTBST;
-	*lnv = t->value;
+	ci->lastCell = t->value;
 	return ISBST;
 }
 
 typedef struct SortInfo {
-	int *dest;
+	Cell **dest;
 	int index;
 } SortInfo;
 
@@ -196,13 +213,14 @@ int *tri(int *src, int n) {
 
 int __tri(const Tree *t, void *si) {
 	SortInfo *csi = (SortInfo *)si;
-	csi->dest[csi->index] = t->value;
+	cellcpy(csi->dest[csi->index], t->value);
 	csi->index++;
 	return WALK_SUCCESS;
 }
 
-void supprime(Tree **t, int value) {
-	SonParentDuet pair = findNodeWithParent(*t, value);
+void supprime(Tree **t, const Cell *oldValue,
+			  int (*cmpFunc)(const Cell *oldValue, const Cell *existing)) {
+	SonParentDuet pair = findNodeWithParent(*t, oldValue);
 	Tree *toRemove = pair[0], *parent = pair[1];
 	if (toRemove == NULL)
 		return;
