@@ -1,18 +1,23 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#include "element.h"
+#include <stdlib.h>
+
+typedef struct LLCell {
+	void *value;
+	struct LLCell *previous, *next;
+} LLCell;
 
 typedef struct LinkedList {
-    Element *value;
-    struct LinkedList *previous;
-    struct LinkedList *next;
+    LLCell* first;
+    LLCell *last;
+    size_t sizeofEach;
 } LinkedList;
 
-LinkedList *newLinkedList();
+LinkedList *newLinkedList(size_t size);
 
-LinkedList *freeLinkedList();
+void freeLinkedList(LinkedList *f);
 
-void ajouterAListe(LinkedList **list, Element *e);
+void addToLinkedList(LinkedList *list, void *e);
 
 #endif
