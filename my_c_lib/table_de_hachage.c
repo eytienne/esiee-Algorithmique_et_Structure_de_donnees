@@ -6,10 +6,10 @@
 
 typedef struct KeyValuePair {
 	char *cle;
-	int value;
+	void *value;
 } KeyValuePair;
 
-table_de_hachage_t *cree_table_de_hachage(int taille) {
+table_de_hachage_t *cree_table_de_hachage(int taille, size_t sizeofEach) {
 	table_de_hachage_t *newOne = malloc(sizeof(table_de_hachage_t));
 	newOne->taille = taille;
 	newOne->values = calloc(taille, sizeof(LinkedList *));
