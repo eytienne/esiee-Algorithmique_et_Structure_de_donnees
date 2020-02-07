@@ -1,13 +1,12 @@
 #include "table_de_hachage.h"
 #include <string.h>
 
-table_de_hachage_t *cree_table_de_hachage(int taille) {
-	table_de_hachage_t *newOne =
-		(table_de_hachage_t *)malloc(sizeof(table_de_hachage_t));
+table_de_hachage_t *cree_table_de_hachage(int taille, size_t sizeofEach) {
+	table_de_hachage_t *newOne = malloc(sizeof(table_de_hachage_t));
 	newOne->taille = taille;
-	newOne->values = (Pile **)calloc(taille, sizeof(Pile *));
+	newOne->values = calloc(taille, sizeof(LinkedList *));
 	for (int i = 0; i < taille; i++) {
-		newOne->values[i] = newLinkedList();
+		newOne->values[i] = newLinkedList(sizeofEach);
 	}
 }
 
@@ -26,7 +25,6 @@ int hachage(const table_de_hachage_t *table, char *cle) {
 	return sum % table->taille;
 }
 
-void insere(table_de_hachage_t *table, char* cle, int valeur){
-
-    ajouterAListe(table->values[hachage(table, cle)], valeur);
+void insere(table_de_hachage_t *table, char *cle, int valeur) {
+	addToLinkedList(table->values[hachage(table, cle)], valeur);
 }

@@ -14,7 +14,7 @@ struct Element {
 	Evenement e;
 };
 
-int ajouterEvenementListe(LinkedList **evts, time_t eventDate,
+int ajouterEvenementListe(LinkedList *evts, time_t eventDate,
 						  const char *eventValue);
 
 void afficheListeEvenement(const LinkedList *evts);
@@ -23,5 +23,7 @@ void afficheEvenement(const LinkedList *evts, time_t dateEvenement);
 
 void afficheEvenementAutour(const LinkedList *evts, time_t dateEvenement,
 							int beforeAfter);
+
+void printEvenement(const Evenement *e);
 
 #endif

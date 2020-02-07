@@ -9,12 +9,12 @@ typedef struct table_de_hachage_t {
 	int taille;
 } table_de_hachage_t;
 
-table_de_hachage_t cree_table_de_hachage(int taille);
+table_de_hachage_t *cree_table_de_hachage(int taille, size_t sizeofEach);
 
-void detruit_table_de_hachage(table_de_hachage_t table);
+void detruit_table_de_hachage(table_de_hachage_t *table);
 
-int hachage(table_de_hachage_t table, char∗ cle);
+int hachage(const table_de_hachage_t *table, char *cle);
 
-void insere(table_de_hachage_t table, char∗ cle, int valeur);
+void insere(table_de_hachage_t *table, char *cle, int valeur);
 
 #endif
