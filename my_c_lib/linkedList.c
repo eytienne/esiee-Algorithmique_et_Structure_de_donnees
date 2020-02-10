@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../algo/TP3/evenement.h"
-typedef struct Evenement Evenement;
-
 LinkedList *newLinkedList(size_t size) {
 	LinkedList *newList = (LinkedList *)malloc(sizeof(LinkedList));
 	assert(newList != NULL);
