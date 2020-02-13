@@ -3,10 +3,16 @@
 
 #include "cell.h"
 
+typedef struct TreeNode {
+	void *value;
+	struct TreeNode *left;
+	struct TreeNode *right;
+} TreeNode;
+
 typedef struct Tree {
-	Cell *value;
-	struct Tree *left;
-	struct Tree *right;
+	TreeNode *root;
+	size_t sizeofEach;
+	int (*nodecmp)(const void *newValue, const void *existing);
 } Tree;
 
 enum PATHWAY { INFIXE, PREFIXE, POSTFIXE };
@@ -15,32 +21,30 @@ enum WALK_CHECK { WALK_SUCCESS, WALK_FAILURE };
 
 enum BST_CHECK { ISBST = WALK_SUCCESS, ISNOTBST = WALK_FAILURE };
 
-Tree *cree_arbre(const Cell *value, Tree *left, Tree *right);
+Tree *newTree(size_t sizeofEach,
+			  int (*nodecmp)(const void *newValue, const void *existing));
 
-void detruit_arbre(Tree *t);
+void freeTree(Tree *t);
 
-int nombre_de_noeuds(const Tree *t);
+int countTreeNodes(const Tree *t);
 
-void affiche_arbre(const Tree *t);
+void printTree(const Tree *t, void (*printer)(const void *value));
 
-void affiche_arbre2(const Tree *t);
+void printTree2(const Tree *t, void (*printer)(const void *value));
 
-void insere(Tree *t, const Cell *newValue,
-			int (*cmpFunc)(const Cell *newValue, const Cell *existing));
+void insertIntoTree(Tree *t, const void *newValue);
 
-Tree *trouve_noeud(Tree *t, const Cell *value,
-				   int (*cmpFunc)(const Cell *value, const Cell *existing));
+TreeNode *findTreeNode(Tree *t, const void *value);
 
 int walk(const Tree *t, enum PATHWAY p,
-		 int (*function)(const Tree *, void *buffer), void *buffer);
+		 int (*function)(const TreeNode *, void *buffer), void *buffer);
 
-int isLeaf(const Tree *t);
+int isLeaf(const TreeNode *t);
 
-int verifie(Tree *t, int (*cmpFunc)(const Cell *value, const Cell *existing));
+int isOrdered(const Tree *t);
 
-int *tri(int *src, int n);
+void **heapSort(void **src, int n, size_t size, int (*nodecmp)(const void *newValue, const void *existing));
 
-void supprime(Tree **t, const Cell *oldValue,
-			  int (*cmpFunc)(const Cell *oldValue, const Cell *existing));
+void deleteFromTree(Tree *t, const void *oldValue);
 
 #endif

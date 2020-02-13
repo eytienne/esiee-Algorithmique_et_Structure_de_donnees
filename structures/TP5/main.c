@@ -1,57 +1,67 @@
 #include "../../my_c_lib/tree.h"
-#include "../../my_c_lib/cell.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-Cell *cellFromInt(int init){
-	Cell *newOne = malloc(sizeof(Cell));
-	int *copy = malloc(sizeof(int));
-	*copy = init;
-	newOne->value = copy;
-	newOne->size = sizeof(int);
-}
+int intcmp(const void *c1, const void *c2) { return *(int *)c1 - *(int *)c2; }
 
-int intCellCmp(const Cell *c1, const Cell *c2){
-	return *((int*)c1->value) - *((int*)c2->value);
-}
+void intprint(const void *v) { printf("%d", *(int *)v); }
 
 int main(int argc, char const *argv[]) {
-	Tree *t = cree_arbre(4, NULL, NULL);
-	insere(t, cellFromInt(3), intCellCmp);
-	insere(t, cellFromInt(1), intCellCmp);
-	insere(t, cellFromInt(6), intCellCmp);
-	insere(t, cellFromInt(6), intCellCmp);
-	insere(t, cellFromInt(9), intCellCmp);
-	insere(t, cellFromInt(7), intCellCmp);
 
-	int nb = nombre_de_noeuds(t);
+	Tree *t = newTree(sizeof(int), intcmp);
+	int value = 4;
+	insertIntoTree(t, &value);
+	value = 3;
+	insertIntoTree(t, &value);
+	value = 1;
+	insertIntoTree(t, &value);
+	value = 6;
+	insertIntoTree(t, &value);
+	insertIntoTree(t, &value);
+	value = 9;
+	insertIntoTree(t, &value);
+	value = 7;
+	insertIntoTree(t, &value);
+
+	int nb = countTreeNodes(t);
 	printf("Nb noeuds : %d\n", nb);
 	assert(nb == 7);
-	affiche_arbre(t);
-	affiche_arbre2(t);
+	printTree(t, intprint);
+	printTree2(t, intprint);
 
-	assert(trouve_noeud(t, cellFromInt(6)) != NULL);
-	assert(trouve_noeud(t, cellFromInt(8)) == NULL);
+	value = 6;
+	assert(findTreeNode(t, &value) != NULL);
+	value = 8;
+	assert(findTreeNode(t, &value) == NULL);
 
-	t->value = 0;
-	int badWalk = verifie(t);
+	int newRoot = 0;
+	t->root->value = &newRoot;
+	int badWalk = isOrdered(t);
 	assert(badWalk);
 
-	t->value = 4;
-	badWalk = verifie(t);
+	newRoot = 4;
+	t->root->value = &newRoot;
+	badWalk = isOrdered(t);
 	assert(!badWalk);
 
-	int sortThis[5] = {10, (-1), 4, 8, 2};
-	int *sorted = tri(sortThis, 5);
+	int **sortThis = malloc(5 * sizeof(int *));
+	*sortThis[0] = 10;
+	*sortThis[0] = -1;
+	*sortThis[0] = 4;
+	*sortThis[0] = 8;
+	*sortThis[0] = 2;
+	int **sorted = (int **)heapSort((void **)sortThis, 5, sizeof(int), intcmp);
 	for (size_t i = 0; i < 5; i++)
-		printf("%d,", sorted[i]);
+		printf("%d,", *sorted[i]);
 	printf("\n");
 
-	supprime(&t, 4);
-	assert(t->value == 6);
-	affiche_arbre2(t);
-	nb = nombre_de_noeuds(t);
+	value = 4;
+	deleteFromTree(t, &value);
+	value = 6;
+	assert(intcmp(t->root->value, &value) == 0);
+	printTree2(t, intprint);
+	nb = countTreeNodes(t);
 	printf("Nb noeuds : %d\n", nb);
 	assert(nb == 6);
 
