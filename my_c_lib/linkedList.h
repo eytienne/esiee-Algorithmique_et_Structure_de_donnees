@@ -9,10 +9,12 @@ typedef struct LinkedList {
     struct LinkedList *next;
 } LinkedList;
 
-LinkedList *newLinkedList();
+LinkedList *newLinkedList(size_t sizeofEach);
 
-LinkedList *freeLinkedList();
+void freeLinkedList(LinkedList *l);
 
-void ajouterAListe(LinkedList **list, Element *e);
+void addToLinkedList(LinkedList *l, void *e);
+
+int isEmpty(const LinkedList *l);
 
 #endif

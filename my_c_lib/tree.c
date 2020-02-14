@@ -119,7 +119,7 @@ void insertIntoTree(Tree *t, const void *newValue) {
 	}
 }
 
-TreeNode *findTreeNode(Tree *t, const void *value) {
+const TreeNode *findTreeNode(Tree *t, const void *value) {
 	TreeNode **twp = findNodeWithParent(t, value);
 	TreeNode *ret = twp[0];
 	free(twp);

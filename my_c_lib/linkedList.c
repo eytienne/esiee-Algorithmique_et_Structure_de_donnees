@@ -31,3 +31,5 @@ void ajouterAListe(LinkedList **list, Element *e) {
     
 	*list = newLink;
 }
+
+int isEmpty(const LinkedList *l) { return l->first == NULL; }
