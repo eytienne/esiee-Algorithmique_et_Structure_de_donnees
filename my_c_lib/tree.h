@@ -34,7 +34,7 @@ void printTree2(const Tree *t, void (*printer)(const void *value));
 
 void insertIntoTree(Tree *t, const void *newValue);
 
-TreeNode *findTreeNode(Tree *t, const void *value);
+const TreeNode *findTreeNode(Tree *t, const void *value);
 
 int walk(const Tree *t, enum PATHWAY p,
 		 int (*function)(const TreeNode *, void *buffer), void *buffer);

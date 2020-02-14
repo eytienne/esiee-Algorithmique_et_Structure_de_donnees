@@ -44,3 +44,5 @@ void addToLinkedList(LinkedList *list, void *e) {
 	}
 	list->last = newLink;
 }
+
+int isEmpty(const LinkedList *l) { return l->first == NULL; }

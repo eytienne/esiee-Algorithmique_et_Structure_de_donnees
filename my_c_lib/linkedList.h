@@ -14,10 +14,12 @@ typedef struct LinkedList {
     size_t sizeofEach;
 } LinkedList;
 
-LinkedList *newLinkedList(size_t size);
+LinkedList *newLinkedList(size_t sizeofEach);
 
-void freeLinkedList(LinkedList *f);
+void freeLinkedList(LinkedList *l);
 
-void addToLinkedList(LinkedList *list, void *e);
+void addToLinkedList(LinkedList *l, void *e);
+
+int isEmpty(const LinkedList *l);
 
 #endif
