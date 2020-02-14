@@ -10,6 +10,11 @@ void intprint(const void *v) { printf("%d", *(int *)v); }
 int main(int argc, char const *argv[]) {
 
 	Tree *t = newTree(sizeof(int), intcmp);
+	assert(t != NULL);
+	assert(t->root == NULL);
+	assert(t->sizeofEach = sizeof(int));
+	assert(t->nodecmp == intcmp);
+
 	int value = 4;
 	insertIntoTree(t, &value);
 	value = 3;
@@ -46,14 +51,19 @@ int main(int argc, char const *argv[]) {
 	assert(!badWalk);
 
 	int **sortThis = malloc(5 * sizeof(int *));
+	for (int i = 0; i < 5; i++)
+		sortThis[i] = malloc(sizeof(int));
 	*sortThis[0] = 10;
-	*sortThis[0] = -1;
-	*sortThis[0] = 4;
-	*sortThis[0] = 8;
-	*sortThis[0] = 2;
+	*sortThis[1] = -1;
+	*sortThis[2] = 4;
+	*sortThis[3] = 8;
+	*sortThis[4] = 2;
 	int **sorted = (int **)heapSort((void **)sortThis, 5, sizeof(int), intcmp);
-	for (size_t i = 0; i < 5; i++)
-		printf("%d,", *sorted[i]);
+	for (size_t i = 0; i < 5; i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%d", *sorted[i]);
+	}
 	printf("\n");
 
 	value = 4;
