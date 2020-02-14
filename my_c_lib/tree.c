@@ -96,20 +96,26 @@ void printTree2(const Tree *t, void (*printer)(const void *value)) {
 
 void insertIntoTree(Tree *t, const void *newValue) {
 	assert(t != NULL);
+	if (t->root == NULL) {
+		t->root = newTreeNode(newValue, t->sizeofEach);
+		return;
+	}
 	TreeNode *cur = t->root;
 	while (1) {
-		if (t->nodecmp(newValue, cur->value) > 0)
+		if (t->nodecmp(newValue, cur->value) > 0) {
 			if (cur->right == NULL) {
 				cur->right = newTreeNode(newValue, t->sizeofEach);
 				return;
 			} else
 				cur = cur->right;
-		else if (t->nodecmp(newValue, cur->value) <= 0)
+		} else if (t->nodecmp(newValue, cur->value) <= 0) {
+
 			if (cur->left == NULL) {
 				cur->left = newTreeNode(newValue, t->sizeofEach);
 				return;
 			} else
 				cur = cur->left;
+		}
 	}
 }
 
@@ -141,34 +147,34 @@ TreeNode **findNodeWithParent(Tree *t, const void *value) {
 int __walk(const TreeNode *t, enum PATHWAY p,
 		   int (*function)(const TreeNode *, void *buffer), void *buffer) {
 	if (t == NULL)
-		return 0;
+		return WALK_SUCCESS;
 	switch (p) {
 	case INFIXE:
 		if (__walk(t->left, p, function, buffer))
-			return 1;
+			return WALK_FAILURE;
 		if (function(t, buffer))
-			return 1;
+			return WALK_FAILURE;
 		if (__walk(t->right, p, function, buffer))
-			return 1;
+			return WALK_FAILURE;
 		break;
 	case PREFIXE:
 		if (function(t, buffer))
-			return 1;
+			return WALK_FAILURE;
 		if (__walk(t->left, p, function, buffer))
-			return 1;
+			return WALK_FAILURE;
 		if (__walk(t->right, p, function, buffer))
-			return 1;
+			return WALK_FAILURE;
 		break;
 	case POSTFIXE:
 		if (__walk(t->left, p, function, buffer))
-			return 1;
+			return WALK_FAILURE;
 		if (__walk(t->right, p, function, buffer))
-			return 1;
+			return WALK_FAILURE;
 		if (function(t, buffer))
-			return 1;
+			return WALK_FAILURE;
 		break;
 	}
-	return 0;
+	return WALK_SUCCESS;
 }
 
 int walk(const Tree *t, enum PATHWAY p,
@@ -210,6 +216,8 @@ typedef struct SortInfo {
 } SortInfo;
 
 int __heapSort(const TreeNode *t, void *si) {
+	if (t == NULL)
+		return WALK_SUCCESS;
 	SortInfo *csi = (SortInfo *)si;
 	memcpy(csi->dest[csi->index], t->value, csi->size);
 	csi->index++;
@@ -226,9 +234,11 @@ void **heapSort(void **src, int n, size_t size,
 		insertIntoTree(t, src[i]);
 
 	SortInfo si;
-	si.dest = calloc(n, sizeof(int));
+	si.dest = malloc(n * sizeof(void *));
+	for (int i = 0; i < n; i++)
+		si.dest[i] = malloc(t->sizeofEach);
 	si.index = 0;
-	si.size = size;
+	si.size = t->sizeofEach;
 	int failed = walk(t, INFIXE, __heapSort, &si);
 	void **ret = si.dest;
 	if (failed) {
