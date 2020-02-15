@@ -7,18 +7,6 @@ int intcmp(const void *c1, const void *c2) { return *(int *)c1 - *(int *)c2; }
 
 void intprint(const void *v) { printf("%d", *(int *)v); }
 
-int prefixePrint(const TreeNode *t, void *buffer) {
-	int *nbTabs = (int *)buffer;
-	for (int i = 0; i < *nbTabs; i++)
-		printf("\t");
-	printf("\\--%d--\n", *(int *)t->value);
-	if (isLeaf(t))
-		*nbTabs -= 1;
-	else
-		*nbTabs += 1;
-	return 0;
-}
-
 int main(int argc, char const *argv[]) {
 
 	Tree *t = newTree(sizeof(int), intcmp);
@@ -87,8 +75,7 @@ int main(int argc, char const *argv[]) {
 	printf("Nb noeuds : %d\n", nb);
 	assert(nb == 6);
 
-	int start = 0;
-	walk(t, PREFIXE, prefixePrint, &start);
+	prefixPrint(t, intprint);
 
 	freeTree(t, NULL);
 

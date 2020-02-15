@@ -5,9 +5,32 @@
 #include <stdlib.h>
 #include <string.h>
 
-TreeNode **findNodeWithParent(Tree *t, const void *value);
-void cutTree(TreeNode *toCut, TreeNode *from);
-const TreeNode **minNodeWithParent(const TreeNode *t);
+TreeNode **findNodeWithParent(Tree *t, const void *value) {
+	assert(t != NULL);
+	TreeNode **twp = malloc(2 * sizeof(TreeNode *));
+	twp[0] = twp[1] = NULL;
+	TreeNode *cur = t->root;
+	while (cur != NULL) {
+		int cmp = t->nodecmp(value, cur->value);
+		if (cmp == 0) {
+			twp[0] = cur;
+			break;
+		} else if (cmp > 0)
+			cur = cur->right;
+		else
+			cur = cur->left;
+		twp[1] = cur;
+	}
+	return twp;
+}
+
+void cutTree(TreeNode *toCut, TreeNode *from) {
+	assert(from != NULL);
+	if (from->left == toCut)
+		from->left = NULL;
+	else if (from->right == toCut)
+		from->right = NULL;
+}
 
 TreeNode *newTreeNode(const void *value, size_t size) {
 	assert(value != NULL);
@@ -102,6 +125,30 @@ void printTree2(const Tree *t, void (*printer)(const void *value)) {
 	printf("\n");
 }
 
+typedef struct PrefixPrintInfo {
+	int nbTabs;
+	void (*printer)(const void *value);
+} PrefixPrintInfo;
+
+int __prefixePrint(const TreeNode *t, void *buffer) {
+	PrefixPrintInfo *ppi = (PrefixPrintInfo *)buffer;
+	for (int i = 0; i < ppi->nbTabs; i++)
+		printf("    ");
+	printf("\\---");
+	ppi->printer(t->value);
+	if (isLeaf(t))
+		ppi->nbTabs -= 1;
+	else
+		ppi->nbTabs += 1;
+	printf("\n");
+	return WALK_SUCCESS;
+}
+
+void prefixPrint(const Tree *t, void (*printer)(const void *value)) {
+	PrefixPrintInfo ppi = {0, printer};
+	walk(t, PREFIXE, __prefixePrint, &ppi);
+}
+
 void insertIntoTree(Tree *t, const void *newValue) {
 	assert(t != NULL);
 	if (t->root == NULL) {
@@ -135,25 +182,6 @@ const TreeNode *findTreeNode(Tree *t, const void *value) {
 	return ret;
 }
 
-TreeNode **findNodeWithParent(Tree *t, const void *value) {
-	assert(t != NULL);
-	TreeNode **twp = malloc(2 * sizeof(TreeNode *));
-	twp[0] = twp[1] = NULL;
-	TreeNode *cur = t->root;
-	while (cur != NULL) {
-		int cmp = t->nodecmp(value, cur->value);
-		if (cmp == 0) {
-			twp[0] = cur;
-			break;
-		} else if (cmp > 0)
-			cur = cur->right;
-		else
-			cur = cur->left;
-		twp[1] = cur;
-	}
-	return twp;
-}
-
 int __walk(const TreeNode *t, enum PATHWAY p,
 		   int (*function)(const TreeNode *, void *buffer), void *buffer) {
 	if (t == NULL)
@@ -183,6 +211,8 @@ int __walk(const TreeNode *t, enum PATHWAY p,
 		if (function(t, buffer))
 			return WALK_FAILURE;
 		break;
+	default:
+		return WALK_FAILURE;
 	}
 	return WALK_SUCCESS;
 }
@@ -297,14 +327,6 @@ void deleteFromTree(Tree *t, const void *oldValue) {
 			parent->right = newSon;
 	}
 	free(toRemove);
-}
-
-void cutTree(TreeNode *toCut, TreeNode *from) {
-	assert(from != NULL);
-	if (from->left == toCut)
-		from->left = NULL;
-	else if (from->right == toCut)
-		from->right = NULL;
 }
 
 const TreeNode **minNodeWithParent(const TreeNode *t) {

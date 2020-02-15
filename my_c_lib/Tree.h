@@ -5,8 +5,7 @@
 
 typedef struct TreeNode {
 	void *value;
-	struct TreeNode *left;
-	struct TreeNode *right;
+	struct TreeNode *left, *right;
 } TreeNode;
 
 typedef struct Tree {
@@ -32,6 +31,8 @@ void printTree(const Tree *t, void (*printer)(const void *value));
 
 void printTree2(const Tree *t, void (*printer)(const void *value));
 
+void prefixPrint(const Tree *t, void (*printer)(const void *value));
+
 void insertIntoTree(Tree *t, const void *newValue);
 
 const TreeNode *findTreeNode(Tree *t, const void *value);
@@ -49,5 +50,7 @@ int isOrdered(const Tree *t);
 void **heapSort(void **src, int n, size_t size, int (*nodecmp)(const void *newValue, const void *existing));
 
 void deleteFromTree(Tree *t, const void *oldValue);
+
+const TreeNode **minNodeWithParent(const TreeNode *t);
 
 #endif
