@@ -339,3 +339,22 @@ const TreeNode **minNodeWithParent(const TreeNode *t) {
 	}
 	return spd;
 }
+
+const void rotateRight(TreeNode* tn){
+
+}
+
+int __height(const TreeNode *tn, void *buffer){
+
+}
+
+typedef struct HeightInfo
+{
+
+} HeightInfo;
+
+
+int height(const TreeNode *tn){
+
+	__walk(tn, INFIXE, __height, NULL);
+}
