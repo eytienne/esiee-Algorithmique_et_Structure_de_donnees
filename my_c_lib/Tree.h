@@ -24,7 +24,7 @@ enum BST_CHECK { ISBST = WALK_SUCCESS, ISNOTBST = WALK_FAILURE };
 Tree *newTree(size_t sizeofEach,
 			  int (*nodecmp)(const void *newValue, const void *existing));
 
-void freeTree(Tree *t);
+void freeTree(Tree *t, void (*freeValue)(void *value));
 
 int countTreeNodes(const Tree *t);
 
@@ -38,6 +38,9 @@ const TreeNode *findTreeNode(Tree *t, const void *value);
 
 int walk(const Tree *t, enum PATHWAY p,
 		 int (*function)(const TreeNode *, void *buffer), void *buffer);
+
+int transform(Tree *t, enum PATHWAY p,
+			  int (*function)(TreeNode *, void *buffer), void *buffer);
 
 int isLeaf(const TreeNode *t);
 

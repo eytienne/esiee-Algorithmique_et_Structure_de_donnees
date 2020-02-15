@@ -29,16 +29,15 @@ Tree *newTree(size_t sizeofEach,
 	return newOne;
 }
 
-void __freeTree(TreeNode *t) {
-	if (t == NULL)
-		return;
-	__freeTree(t->left);
-	__freeTree(t->right);
+int __freeTree(TreeNode *t, void *buffer) {
+	void (*freeValue)(void *value) = (void (*)(void *))buffer;
+	freeValue(t->value);
 	free(t);
+	return WALK_SUCCESS;
 }
 
-void freeTree(Tree *t) {
-	__freeTree(t->root);
+void freeTree(Tree *t, void (*freeValue)(void *value)) {
+	transform(t, PREFIXE, __freeTree, freeValue);
 	t->sizeofEach = -1;
 	t->nodecmp = NULL;
 }
@@ -180,6 +179,11 @@ int __walk(const TreeNode *t, enum PATHWAY p,
 int walk(const Tree *t, enum PATHWAY p,
 		 int (*function)(const TreeNode *, void *buffer), void *buffer) {
 	return __walk(t->root, p, function, buffer);
+}
+
+int transform(Tree *t, enum PATHWAY p,
+			  int (*function)(TreeNode *, void *buffer), void *buffer) {
+	return walk(t, p, (int (*)(const TreeNode *, void *))function, buffer);
 }
 
 int isLeaf(const TreeNode *t) {
