@@ -1,5 +1,5 @@
 #include "evenement.h"
-#include "../../my_c_lib/linkedList.h"
+#include "../../my_c_lib/LinkedList.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-#include "tree.h"
+#include "Tree.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdio.h>

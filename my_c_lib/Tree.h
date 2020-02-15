@@ -1,7 +1,7 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "cell.h"
+#include "Cell.h"
 
 typedef struct TreeNode {
 	void *value;

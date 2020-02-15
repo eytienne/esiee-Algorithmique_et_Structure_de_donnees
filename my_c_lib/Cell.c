@@ -1,4 +1,4 @@
-#include "cell.h"
+#include "Cell.h"
 #include <string.h>
 
 Cell *cellcpy(Cell *dest, const Cell *src) {

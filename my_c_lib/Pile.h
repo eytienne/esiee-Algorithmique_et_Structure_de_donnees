@@ -6,7 +6,7 @@
 #define PILE__H
 
 #include <stdbool.h>
-#include "cell.h"
+#include "Cell.h"
 
 #define PILE_CAPACITE 10 /* Taille de la pile */
 

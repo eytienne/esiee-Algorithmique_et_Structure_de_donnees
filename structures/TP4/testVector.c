@@ -1,4 +1,4 @@
-#include "../../my_c_lib/vector.h"
+#include "../../my_c_lib/Vector.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

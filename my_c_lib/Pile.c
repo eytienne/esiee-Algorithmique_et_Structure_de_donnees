@@ -2,7 +2,7 @@
  *  Objectif : Implantation d'une pile de char
  ***************************************************************/
 
-#include "pile.h"
+#include "Pile.h"
 #include <assert.h>
 #include <stdlib.h>
 

@@ -1,6 +1,6 @@
 // #include "compression.h"
-#include "../../my_c_lib/linkedList.h"
-#include "../../my_c_lib/tree.h"
+#include "../../my_c_lib/LinkedList.h"
+#include "../../my_c_lib/Tree.h"
 #include <stdio.h>
 #include <stdlib.h>
 

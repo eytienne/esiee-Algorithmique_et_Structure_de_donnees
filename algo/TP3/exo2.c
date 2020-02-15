@@ -1,4 +1,4 @@
-#include "../../my_c_lib/linkedList.h"
+#include "../../my_c_lib/LinkedList.h"
 #include "evenement.h"
 #include <assert.h>
 #include <stdio.h>

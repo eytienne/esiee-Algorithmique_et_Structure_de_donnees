@@ -1,8 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include "cell.h"
-
 struct Vector {
 	void **values;
 	size_t sizeofEach;

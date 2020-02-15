@@ -1,7 +1,7 @@
 #ifndef table_de_hachage_H
 #define table_de_hachage_H
 
-#include "linkedList.h"
+#include "LinkedList.h"
 #include <stdlib.h>
 
 typedef struct table_de_hachage_t {

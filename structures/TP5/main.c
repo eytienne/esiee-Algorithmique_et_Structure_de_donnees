@@ -1,4 +1,4 @@
-#include "../../my_c_lib/tree.h"
+#include "../../my_c_lib/Tree.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

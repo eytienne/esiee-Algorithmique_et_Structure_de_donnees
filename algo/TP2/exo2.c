@@ -1,4 +1,4 @@
-#include "../../my_c_lib/vector.h"
+#include "../../my_c_lib/Vector.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
