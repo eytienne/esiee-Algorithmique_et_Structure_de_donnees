@@ -1,1 +1,1 @@
-# esiee-Algorithmique_et_Structure_de_donnees
+# esiee-Algorithmique_et_Structures_de_donnees
