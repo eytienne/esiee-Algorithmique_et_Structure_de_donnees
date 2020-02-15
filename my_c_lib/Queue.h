@@ -7,7 +7,7 @@ typedef LinkedList Queue;
 
 Queue *newQueue(size_t sizeofEach);
 
-void freeQueue(Queue *f);
+void freeQueue(Queue *q, void (*freeValue)(void *value));
 
 void addToQueue(Queue *q, void *e);
 

@@ -5,7 +5,9 @@ Queue *newQueue(size_t sizeofEach) {
 	return (Queue *)newLinkedList(sizeofEach);
 }
 
-void freeQueue(Queue *f) { freeLinkedList(f); }
+void freeQueue(Queue *q, void (*freeValue)(void *value)) {
+	freeLinkedList(q, freeValue);
+}
 
 void addToQueue(Queue *q, void *e) { addToLinkedList(q, e); }
 
