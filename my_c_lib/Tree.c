@@ -10,6 +10,7 @@ void cutTree(TreeNode *toCut, TreeNode *from);
 const TreeNode **minNodeWithParent(const TreeNode *t);
 
 TreeNode *newTreeNode(const void *value, size_t size) {
+	assert(value != NULL);
 	assert(size > 0);
 	TreeNode *newOne = (TreeNode *)malloc(sizeof(TreeNode));
 	newOne->value = malloc(size);
@@ -31,13 +32,18 @@ Tree *newTree(size_t sizeofEach,
 
 int __freeTree(TreeNode *t, void *buffer) {
 	void (*freeValue)(void *value) = (void (*)(void *))buffer;
-	freeValue(t->value);
+	if (freeValue != NULL)
+		freeValue(t->value);
+	else
+		free(t->value);
 	free(t);
 	return WALK_SUCCESS;
 }
 
 void freeTree(Tree *t, void (*freeValue)(void *value)) {
-	transform(t, PREFIXE, __freeTree, freeValue);
+	assert(t != NULL);
+	transform(t, POSTFIXE, __freeTree, freeValue);
+	t->root = NULL;
 	t->sizeofEach = -1;
 	t->nodecmp = NULL;
 }
@@ -48,6 +54,7 @@ int __countTreeNodes(const TreeNode *t, void *counter) {
 }
 
 int countTreeNodes(const Tree *t) {
+	assert(t != NULL);
 	int counter = 0;
 	walk(t, INFIXE, __countTreeNodes, &counter);
 	return counter;
@@ -71,6 +78,7 @@ int __printTree(const TreeNode *t, void *pi) {
 }
 
 void printTree(const Tree *t, void (*printer)(const void *value)) {
+	assert(t != NULL);
 	PrintInfo pi = {printer, 1};
 	walk(t, INFIXE, __printTree, &pi);
 	printf("\n");
@@ -89,6 +97,7 @@ void __printTree2(const TreeNode *t, void (*printer)(const void *value)) {
 }
 
 void printTree2(const Tree *t, void (*printer)(const void *value)) {
+	assert(t != NULL);
 	__printTree2(t->root, printer);
 	printf("\n");
 }
@@ -119,6 +128,7 @@ void insertIntoTree(Tree *t, const void *newValue) {
 }
 
 const TreeNode *findTreeNode(Tree *t, const void *value) {
+	assert(t != NULL);
 	TreeNode **twp = findNodeWithParent(t, value);
 	TreeNode *ret = twp[0];
 	free(twp);
@@ -126,6 +136,7 @@ const TreeNode *findTreeNode(Tree *t, const void *value) {
 }
 
 TreeNode **findNodeWithParent(Tree *t, const void *value) {
+	assert(t != NULL);
 	TreeNode **twp = malloc(2 * sizeof(TreeNode *));
 	twp[0] = twp[1] = NULL;
 	TreeNode *cur = t->root;
@@ -178,6 +189,7 @@ int __walk(const TreeNode *t, enum PATHWAY p,
 
 int walk(const Tree *t, enum PATHWAY p,
 		 int (*function)(const TreeNode *, void *buffer), void *buffer) {
+	assert(t != NULL);
 	return __walk(t->root, p, function, buffer);
 }
 
@@ -206,6 +218,7 @@ int __isOrdered(const TreeNode *t, void *buffer) {
 }
 
 int isOrdered(const Tree *t) {
+	assert(t != NULL);
 	CheckInfo ci;
 	ci.last = NULL;
 	ci.cmpFunc = t->nodecmp;
@@ -230,8 +243,11 @@ int __heapSort(const TreeNode *t, void *si) {
 
 void **heapSort(void **src, int n, size_t size,
 				int (*nodecmp)(const void *newValue, const void *existing)) {
+	assert(size > 0);
 	if (n <= 0)
 		return NULL;
+	assert(src != NULL);
+	assert(nodecmp != NULL);
 
 	Tree *t = newTree(size, nodecmp);
 	for (int i = 0; i < n; i++)
@@ -253,6 +269,7 @@ void **heapSort(void **src, int n, size_t size,
 }
 
 void deleteFromTree(Tree *t, const void *oldValue) {
+	assert(t != NULL);
 	TreeNode **pair = findNodeWithParent(t, oldValue);
 	TreeNode *toRemove = pair[0], *parent = pair[1];
 	if (toRemove == NULL)
@@ -283,6 +300,7 @@ void deleteFromTree(Tree *t, const void *oldValue) {
 }
 
 void cutTree(TreeNode *toCut, TreeNode *from) {
+	assert(from != NULL);
 	if (from->left == toCut)
 		from->left = NULL;
 	else if (from->right == toCut)
@@ -293,10 +311,9 @@ const TreeNode **minNodeWithParent(const TreeNode *t) {
 	const TreeNode **spd = malloc(2 * sizeof(TreeNode *));
 	spd[0] = t;
 	spd[1] = NULL;
-	while (t->left != NULL) {
-		spd[0] = t->left;
+	while (spd[0] != NULL && spd[0]->left != NULL) {
 		spd[1] = t;
-		t = t->left;
+		spd[0] = t->left;
 	}
 	return spd;
 }

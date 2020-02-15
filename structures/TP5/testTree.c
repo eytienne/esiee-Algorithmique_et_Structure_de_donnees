@@ -90,5 +90,7 @@ int main(int argc, char const *argv[]) {
 	int start = 0;
 	walk(t, PREFIXE, prefixePrint, &start);
 
+	freeTree(t, NULL);
+
 	return 0;
 }
