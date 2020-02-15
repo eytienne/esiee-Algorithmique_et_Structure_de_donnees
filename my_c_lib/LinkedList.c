@@ -12,16 +12,20 @@ LinkedList *newLinkedList(size_t size) {
 	return newList;
 }
 
-void freeLinkedList(LinkedList *f) {
-	assert(f != NULL);
-	LLCell *cur = f->first;
+void freeLinkedList(LinkedList *l, void (*freeValue)(void *value)) {
+	assert(l != NULL);
+	LLCell *cur = l->first;
 	while (cur != NULL) {
 		LLCell *next = cur->next;
+		if (freeValue != NULL)
+			freeValue(cur->value);
+		else
+			free(cur->value);
 		free(cur);
 		cur = next;
 	}
-	f->first = f->last = NULL;
-	free(f);
+	l->first = l->last = NULL;
+	free(l);
 }
 
 void addToLinkedList(LinkedList *list, void *e) {

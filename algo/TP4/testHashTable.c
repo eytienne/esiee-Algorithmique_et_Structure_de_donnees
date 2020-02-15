@@ -1,44 +1,48 @@
-#include "../../my_c_lib/table_de_hachage.h"
+#include "../../my_c_lib/HashTable.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char const *argv[]) {
-	table_de_hachage_t *t = cree_table_de_hachage(2);
+
+	HashTable *t = newHashTable(2, sizeof(int));
 	assert(t != NULL);
-	assert(t->taille == 2);
+	assert(t->capacity == 2);
 
 	char *first = "first";
 	char *second = "second";
 	char *third = "third";
 
-	insere(t, first, 1);
+	int value = 1;
+	put(t, first, &value);
 
 	int j = 0;
-	assert(recherche(t, first, &j));
+	assert(get(t, first, &j));
 	assert(j == 1);
 
-	insere(t, second, 2);
-	insere(t, third, 3);
+	value = 2;
+	put(t, second, &value);
+	value = 3;
+	put(t, third, &value);
 	j = 0;
-	assert(recherche(t, first, &j));
+	assert(get(t, first, &j));
 	assert(j == 1);
 	j = 0;
-	assert(recherche(t, second, &j));
+	assert(get(t, second, &j));
 	assert(j == 2);
 	j = 0;
-	assert(recherche(t, third, &j));
+	assert(get(t, third, &j));
 	assert(j == 3);
 
-	supprime(t, first);
+	removeFromHashTable(t, first);
 	j = 0;
-	assert(!recherche(t, first, &j));
+	assert(!get(t, first, &j));
 	assert(j == 0);
 	j = 0;
-	assert(recherche(t, second, &j));
+	assert(get(t, second, &j));
 	assert(j == 2);
 	j = 0;
-	assert(recherche(t, third, &j));
+	assert(get(t, third, &j));
 	assert(j == 3);
 
 	return 0;

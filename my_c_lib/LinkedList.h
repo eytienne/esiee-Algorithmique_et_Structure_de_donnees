@@ -16,7 +16,7 @@ typedef struct LinkedList {
 
 LinkedList *newLinkedList(size_t sizeofEach);
 
-void freeLinkedList(LinkedList *l);
+void freeLinkedList(LinkedList *l, void (*freeValue)(void *value));
 
 void addToLinkedList(LinkedList *l, void *e);
 
