@@ -1,6 +1,6 @@
 // #include "compression.h"
 #include "../../my_c_lib/LinkedList.h"
-#include "../../my_c_lib/Tree.h"
+#include "../../my_c_lib/BSTree.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,10 +24,10 @@ void compress(FILE *src, char *filename) {
 	}
 
 	char c;
-	LinkedList *liste = newLinkedList(sizeof(Tree));
+	LinkedList *liste = newLinkedList(sizeof(BSTree));
 	for (int i = 0; i < 255; i++) {
 		if (counters[i] > 0) {
-			Tree *arbre = creationArbre((char)i, counters[i]);
+			BSTree *arbre = creationArbre((char)i, counters[i]);
 			addToLinkedList(liste, arbre);
 		}
 	}
@@ -38,7 +38,7 @@ void compress(FILE *src, char *filename) {
 
 void uncompress(FILE *dest, char *filename);
 
-Tree *__countToTree(int letters[255], int beg, int end) {}
+BSTree *__countToTree(int letters[255], int beg, int end) {}
 
 // void arbreHuffman(LinkedList *l) {
 // 	LLCell *test = l->first;

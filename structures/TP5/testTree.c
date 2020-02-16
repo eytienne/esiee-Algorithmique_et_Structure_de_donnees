@@ -1,4 +1,4 @@
-#include "../../my_c_lib/Tree.h"
+#include "../../my_c_lib/BSTree.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +9,7 @@ void intprint(const void *v) { printf("%d", *(int *)v); }
 
 int main(int argc, char const *argv[]) {
 
-	Tree *t = newTree(sizeof(int), intcmp);
+	BSTree *t = newTree(sizeof(int), intcmp);
 	assert(t != NULL);
 	assert(t->root == NULL);
 	assert(t->sizeofEach = sizeof(int));
