@@ -271,7 +271,7 @@ int __heapSort(const TreeNode *t, void *si) {
 	return WALK_SUCCESS;
 }
 
-void **heapSort(void **src, int n, size_t size,
+void **treeSort(void **src, int n, size_t size,
 				int (*nodecmp)(const void *newValue, const void *existing)) {
 	assert(size > 0);
 	if (n <= 0)

@@ -58,7 +58,7 @@ int main(int argc, char const *argv[]) {
 	*sortThis[2] = 4;
 	*sortThis[3] = 8;
 	*sortThis[4] = 2;
-	int **sorted = (int **)heapSort((void **)sortThis, 5, sizeof(int), intcmp);
+	int **sorted = (int **)treeSort((void **)sortThis, 5, sizeof(int), intcmp);
 	for (size_t i = 0; i < 5; i++) {
 		if (i > 0)
 			printf(", ");

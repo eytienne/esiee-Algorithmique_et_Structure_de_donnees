@@ -47,7 +47,7 @@ int isLeaf(const TreeNode *t);
 
 int isOrdered(const Tree *t);
 
-void **heapSort(void **src, int n, size_t size, int (*nodecmp)(const void *newValue, const void *existing));
+void **treeSort(void **src, int n, size_t size, int (*nodecmp)(const void *newValue, const void *existing));
 
 void deleteFromTree(Tree *t, const void *oldValue);
 
