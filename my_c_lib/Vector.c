@@ -38,14 +38,9 @@ int capacity(const Vector *v) { return v->capacity; }
 void *get(const Vector *v, int index) {
 	assert(index >= 0 && index < v->size);
 	int i = 0;
-	printf("step %d\n", i++);
 	if (v->values[index] == NULL)
 		return NULL;
-
-	printf("step %d\n", i++);
 	void *ret = malloc(v->sizeofEach);
-
-	printf("step %d (%p)\n", i++, v->values[index]);
 	memcpy(ret, v->values[index], v->sizeofEach);
 	return ret;
 }

@@ -1,5 +1,6 @@
 #include "Queue.h"
 #include <assert.h>
+#include <stdlib.h>
 
 Queue *newQueue(size_t sizeofEach) {
 	return (Queue *)newLinkedList(sizeofEach);
