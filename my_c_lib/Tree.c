@@ -65,7 +65,7 @@ int __freeTree(TreeNode *t, void *buffer) {
 
 void freeTree(Tree *t, void (*freeValue)(void *value)) {
 	assert(t != NULL);
-	transform(t, POSTFIXE, __freeTree, freeValue);
+	transformTree(t, POSTFIXE, __freeTree, freeValue);
 	t->root = NULL;
 	t->sizeofEach = -1;
 	t->nodecmp = NULL;
@@ -79,7 +79,7 @@ int __countTreeNodes(const TreeNode *t, void *counter) {
 int countTreeNodes(const Tree *t) {
 	assert(t != NULL);
 	int counter = 0;
-	walk(t, INFIXE, __countTreeNodes, &counter);
+	walkTree(t, INFIXE, __countTreeNodes, &counter);
 	return counter;
 }
 
@@ -103,7 +103,7 @@ int __printTree(const TreeNode *t, void *pi) {
 void printTree(const Tree *t, void (*printer)(const void *value)) {
 	assert(t != NULL);
 	PrintInfo pi = {printer, 1};
-	walk(t, INFIXE, __printTree, &pi);
+	walkTree(t, INFIXE, __printTree, &pi);
 	printf("\n");
 }
 
@@ -146,7 +146,7 @@ int __prefixePrint(const TreeNode *t, void *buffer) {
 
 void prefixPrint(const Tree *t, void (*printer)(const void *value)) {
 	PrefixPrintInfo ppi = {0, printer};
-	walk(t, PREFIXE, __prefixePrint, &ppi);
+	walkTree(t, PREFIXE, __prefixePrint, &ppi);
 }
 
 void insertIntoTree(Tree *t, const void *newValue) {
@@ -182,31 +182,31 @@ const TreeNode *findTreeNode(Tree *t, const void *value) {
 	return ret;
 }
 
-int __walk(const TreeNode *t, enum PATHWAY p,
+int walk(const TreeNode *t, enum PATHWAY p,
 		   int (*function)(const TreeNode *, void *buffer), void *buffer) {
 	if (t == NULL)
 		return WALK_SUCCESS;
 	switch (p) {
 	case INFIXE:
-		if (__walk(t->left, p, function, buffer))
+		if (walk(t->left, p, function, buffer))
 			return WALK_FAILURE;
 		if (function(t, buffer))
 			return WALK_FAILURE;
-		if (__walk(t->right, p, function, buffer))
+		if (walk(t->right, p, function, buffer))
 			return WALK_FAILURE;
 		break;
 	case PREFIXE:
 		if (function(t, buffer))
 			return WALK_FAILURE;
-		if (__walk(t->left, p, function, buffer))
+		if (walk(t->left, p, function, buffer))
 			return WALK_FAILURE;
-		if (__walk(t->right, p, function, buffer))
+		if (walk(t->right, p, function, buffer))
 			return WALK_FAILURE;
 		break;
 	case POSTFIXE:
-		if (__walk(t->left, p, function, buffer))
+		if (walk(t->left, p, function, buffer))
 			return WALK_FAILURE;
-		if (__walk(t->right, p, function, buffer))
+		if (walk(t->right, p, function, buffer))
 			return WALK_FAILURE;
 		if (function(t, buffer))
 			return WALK_FAILURE;
@@ -217,15 +217,15 @@ int __walk(const TreeNode *t, enum PATHWAY p,
 	return WALK_SUCCESS;
 }
 
-int walk(const Tree *t, enum PATHWAY p,
+int walkTree(const Tree *t, enum PATHWAY p,
 		 int (*function)(const TreeNode *, void *buffer), void *buffer) {
 	assert(t != NULL);
-	return __walk(t->root, p, function, buffer);
+	return walk(t->root, p, function, buffer);
 }
 
-int transform(Tree *t, enum PATHWAY p,
+int transformTree(Tree *t, enum PATHWAY p,
 			  int (*function)(TreeNode *, void *buffer), void *buffer) {
-	return walk(t, p, (int (*)(const TreeNode *, void *))function, buffer);
+	return walkTree(t, p, (int (*)(const TreeNode *, void *))function, buffer);
 }
 
 int isLeaf(const TreeNode *t) {
@@ -252,7 +252,7 @@ int isOrdered(const Tree *t) {
 	CheckInfo ci;
 	ci.last = NULL;
 	ci.cmpFunc = t->nodecmp;
-	int badWalk = walk(t, INFIXE, __isOrdered, &ci);
+	int badWalk = walkTree(t, INFIXE, __isOrdered, &ci);
 	return badWalk ? ISNOTBST : ISBST;
 }
 
@@ -289,7 +289,7 @@ void **treeSort(void **src, int n, size_t size,
 		si.dest[i] = malloc(t->sizeofEach);
 	si.index = 0;
 	si.size = t->sizeofEach;
-	int failed = walk(t, INFIXE, __heapSort, &si);
+	int failed = walkTree(t, INFIXE, __heapSort, &si);
 	void **ret = si.dest;
 	if (failed) {
 		free(ret);
