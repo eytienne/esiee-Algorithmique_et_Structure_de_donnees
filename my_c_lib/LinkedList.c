@@ -12,13 +12,24 @@ LinkedList *newLinkedList(size_t size) {
 	return newList;
 }
 
+void __applyWithoutBuffer(void *value, void *buffer) {
+	void (*freeValue)(void *value) = (void (*)(void *))buffer;
+	freeValue(value);
+}
+
 void freeLinkedList(LinkedList *l, void (*freeValue)(void *value)) {
+	freeLinkedListWithBuffer(l, __applyWithoutBuffer, freeValue);
+}
+
+void freeLinkedListWithBuffer(LinkedList *l,
+							  void (*freeValue)(void *value, void *buffer),
+							  void *buffer) {
 	assert(l != NULL);
 	LLCell *cur = l->first;
 	while (cur != NULL) {
 		LLCell *next = cur->next;
 		if (freeValue != NULL)
-			freeValue(cur->value);
+			freeValue(cur->value, buffer);
 		else
 			free(cur->value);
 		free(cur);
@@ -49,4 +60,4 @@ void addToLinkedList(LinkedList *list, void *e) {
 	list->last = newLink;
 }
 
-int isEmpty(const LinkedList *l) { return l->first == NULL; }
+int isLLEmpty(const LinkedList *l) { return l->first == NULL; }

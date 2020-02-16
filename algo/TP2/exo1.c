@@ -5,7 +5,7 @@
 #include <time.h>
 
 int insererAIndice(Vector *v, int index, int value) {
-	return insert(v, index, &value, sizeof(int));
+	return insert(v, index, &value);
 }
 
 void supprimeAIndice(Vector *v, int index) {
@@ -30,10 +30,10 @@ int main(int argc, char const *argv[]) {
 
 	srand(time(NULL));
 	Vector *v;
-	create_expert(v, 10, 1);
+	create_expert(v, 10, 1, sizeof(int));
 	for (int i = 0; i < 10; i++) {
 		int r = rand();
-		add(v, &r, sizeof(int));
+		add(v, &r);
 	}
 	display(v);
 	insererAIndice(v, 8, 5);

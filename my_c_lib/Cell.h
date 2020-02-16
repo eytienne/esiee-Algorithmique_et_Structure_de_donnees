@@ -1,7 +1,7 @@
 #ifndef CELL_H
 #define CELL_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef struct Cell {
 	void *value;

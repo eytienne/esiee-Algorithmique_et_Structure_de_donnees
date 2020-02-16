@@ -2,7 +2,7 @@
 #define table_de_hachage_H
 
 #include "LinkedList.h"
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef struct HashTable {
 	LinkedList **values;

@@ -48,8 +48,8 @@ int getBPStep(const BinaryPath *bp, size_t index) {
 void printBinaryPath(const BinaryPath *bp) {
 	for (size_t i = 0;
 
-		 //  i < bp->length
-		 i < (bp->length / 8 + (bp->length % 8 != 0)) * 8
+		i < bp->length
+		//  i < (bp->length / 8 + (bp->length % 8 != 0)) * 8
 
 		 ;
 		 i++) {

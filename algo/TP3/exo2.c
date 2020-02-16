@@ -23,6 +23,6 @@ int main(int argc, char const *argv[]) {
 
 	printf("---------------------\n");
 
-	afficheEvenementAutour(evts, t0 + 2, 1);
+	afficheEvenementAutour(evts, t0 + 3, 1);
 	return 0;
 }

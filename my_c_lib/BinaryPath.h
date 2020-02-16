@@ -1,7 +1,7 @@
 #ifndef BINARY_PATH_H
 #define BINARY_PATH_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef struct BinaryPath {
 	unsigned char *bits;

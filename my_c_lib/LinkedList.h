@@ -1,7 +1,7 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef struct LLCell {
 	void *value;
@@ -18,8 +18,10 @@ LinkedList *newLinkedList(size_t sizeofEach);
 
 void freeLinkedList(LinkedList *l, void (*freeValue)(void *value));
 
+void freeLinkedListWithBuffer(LinkedList *l, void (*freeValue)(void *value, void *buffer), void *buffer);
+
 void addToLinkedList(LinkedList *l, void *e);
 
-int isEmpty(const LinkedList *l);
+int isLLEmpty(const LinkedList *l);
 
 #endif
