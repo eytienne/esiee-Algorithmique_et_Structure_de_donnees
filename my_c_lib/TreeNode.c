@@ -1,11 +1,11 @@
 #include "TreeNode.h"
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
-TreeNode *newTreeNode(const void *value, size_t size, TreeNode *left, TreeNode *right)
-{
+TreeNode *newTreeNode(const void *value, size_t size, TreeNode *left,
+					  TreeNode *right) {
 	assert(value != NULL);
 	assert(size > 0);
 	TreeNode *newOne = (TreeNode *)malloc(sizeof(TreeNode));
@@ -22,12 +22,10 @@ int isLeaf(const TreeNode *t) {
 }
 
 int walk(const TreeNode *t, enum PATHWAY p,
-		 int (*function)(const TreeNode *, void *buffer), void *buffer)
-{
+		 int (*function)(const TreeNode *, void *buffer), void *buffer) {
 	if (t == NULL)
 		return WALK_SUCCESS;
-	switch (p)
-	{
+	switch (p) {
 	case INFIXE:
 		if (walk(t->left, p, function, buffer))
 			return WALK_FAILURE;
@@ -75,7 +73,6 @@ int printTreeNode(const TreeNode *t, void *pi) {
 	return WALK_SUCCESS;
 }
 
-
 void printTreeNode2(const TreeNode *t, void (*printer)(const void *value)) {
 	if (t == NULL) {
 		printf("_");
@@ -83,21 +80,26 @@ void printTreeNode2(const TreeNode *t, void (*printer)(const void *value)) {
 	}
 	printf("{");
 	printTreeNode2(t->left, printer);
+	printf(", ");
 	printer(t->value);
+	printf(", ");
 	printTreeNode2(t->right, printer);
 	printf("}");
 }
 
 int prefixPrint(const TreeNode *t, void *buffer) {
 	prefixePrintInfo *ppi = (prefixePrintInfo *)buffer;
+	ppi->nbTabs += 1;
+
 	for (int i = 0; i < ppi->nbTabs; i++)
-		printf("    ");
+		printf("\t");
 	printf("\\---");
 	ppi->printer(t->value);
+	printf("\n");
+	
 	if (isLeaf(t))
 		ppi->nbTabs -= 1;
-	else
-		ppi->nbTabs += 1;
-	printf("\n");
+	
+	// printf("ppi->nbTabs : %d", ppi->nbTabs);
 	return WALK_SUCCESS;
 }
