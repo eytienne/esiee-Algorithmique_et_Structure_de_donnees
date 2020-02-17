@@ -46,11 +46,7 @@ void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 	LLCell *cur = pq->first;
 	// tant que le nouveau est supérieur ou égal alors on passe
 	while (cur != NULL && pq_cell_cmp(newOne->value, cur->value) >= 0) {
-		// printf("%d\t", ((PQCell *)cur->value)->priority);
 		cur = cur->next;
-	}
-
-	// cur is the one to insert before
 	if (cur == pq->first) { // insert as new first
 		newOne->next = pq->first;
 		pq->first->previous = newOne;

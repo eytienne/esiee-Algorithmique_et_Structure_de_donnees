@@ -127,6 +127,7 @@ void compress(FILE *src, char *filename) {
 	while (!isLLEmpty(pq)) {
 		printPQPriorities(pq);
 		huffmanHeap = shiftFromPriorityQueue(pq);
+		printPQ(pq);
 		if (!isLLEmpty(pq)) {
 			TreeNode *toMergeWith = shiftFromPriorityQueue(pq);
 			const HuffmanPair *hpOne = (const HuffmanPair *)huffmanHeap->value;
