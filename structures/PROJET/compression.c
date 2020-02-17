@@ -9,27 +9,61 @@
 #define TAILLE_MAX 1000
 #define ASCII_TABLE_SIZE 256
 
-void printPQCell(const PQCell *pqc) {
-	printf("'%c' (%d)\n", *(unsigned char *)(pqc->value), pqc->priority);
+typedef struct HuffmanPair {
+	unsigned char c;
+	unsigned int nbOccurrences;
+} HuffmanPair;
+
+void printHuffmanPair(const HuffmanPair *hp) {
+	printf("hp: ['%c' (%d)]", hp->c, hp->nbOccurrences);
 }
 
-int printTreeNode(const TreeNode *tn, void *buffer) {
-	const unsigned char *uc = (unsigned char *)tn->value;
-	assert(uc != NULL);
-	printf("'%c'\n", *uc);
+void printVoidHuffmanPair(const void *e) {
+	assert(e);
+	printHuffmanPair((const HuffmanPair *)e);
+}
+
+int printTN(const TreeNode *tn, void *buffer) {
+	const HuffmanPair *uc = (const HuffmanPair *)tn->value;
+	assert(uc && "Null value node !");
+	printHuffmanPair(uc);
+	printf("\n");
 	return WALK_SUCCESS;
 }
 
-void printVectorOfPQCell(const Vector *v) {
+void printPQ(const PriorityQueue *pq) {
+	printf("~~~~~~~~~~~~~~~~~\n");
+	LLCell *cur = pq->first;
+	while (cur != NULL) {
+		const PQCell *curPQC = (const PQCell *)cur->value;
+		const TreeNode *curTN = (const TreeNode *)curPQC->value;
+		const HuffmanPair *curHP = (const HuffmanPair *)curTN->value;
+		// printf("pqc:%p tn:%p  %p", curPQC, curTN, curHP);
+		printHuffmanPair(curHP);
+		if (cur == pq->first)
+			printf(" <-- first ");
+		if (cur == pq->last)
+			printf(" <-- last ");
+		printf("\n");
+		cur = cur->next;
+	}
+	printf("\n");
+}
+
+void printVectorOfHP(const Vector *v) {
 	printf("Vector (size : %d, capacity : %d): \n", size(v), capacity(v));
 	for (int i = 0; i < size(v); i++) {
-		PQCell *cc = v->values[i];
-		printf("'%c' (%d)\n", *(unsigned char *)(cc->value), cc->priority);
+		const HuffmanPair *cc = v->values[i];
+		printHuffmanPair(cc);
 	}
 }
 
-int dec_pq_cell_cmp(const void *a, const void *b) {
-	return -1 * pq_cell_cmp(a, b);
+int huffman_pair_cmp(const void *a, const void *b) {
+	assert(a && b && "Arguments should not be null");
+	const HuffmanPair *c = *(const HuffmanPair **)a;
+	const HuffmanPair *d = *(const HuffmanPair **)b;
+	assert(a && b && "Null values cannot be compared");
+	return d->nbOccurrences - c->nbOccurrences;
 }
 
 void compress(FILE *src, char *filename) {
@@ -39,7 +73,9 @@ void compress(FILE *src, char *filename) {
 	while (!feof(src) && fgets(buffer, TAILLE_MAX, src) != NULL) {
 		int i = 0;
 		while (i < TAILLE_MAX) {
-			printf("%c", buffer[i]);
+			if (buffer[i] == '\0')
+				break;
+			printf("%d '%c'\n", i, buffer[i]);
 			counters[buffer[i]]++;
 			if (buffer[i] == '\n')
 				break;
@@ -48,55 +84,51 @@ void compress(FILE *src, char *filename) {
 	}
 
 	Vector *v = malloc(sizeof(Vector));
-	create(v, sizeof(PQCell));
+	create(v, sizeof(HuffmanPair));
 	for (unsigned int i = 0; i < ASCII_TABLE_SIZE; i++) {
 		if (counters[i] > 0) {
-			const PQCell *toAdd =
-				newPQCell(&i, sizeof(unsigned char), counters[i]);
-			add(v, toAdd);
-			printf("%p\n", v->values[size(v) - 1]);
+			const HuffmanPair toAdd = {(unsigned char)i, counters[i]};
+			add(v, &toAdd);
 		}
 	}
-	printVectorOfPQCell(v);
-	qsort(v->values, size(v), sizeof(void *), dec_pq_cell_cmp);
-	printVectorOfPQCell(v);
+	qsort(v->values, size(v), sizeof(void *), huffman_pair_cmp);
+	// printVectorOfHP(v);
 	printf("----------------------\n");
 
-	PQCell **values = (PQCell **)v->values;
+	HuffmanPair **values = (HuffmanPair **)v->values;
+
+	printf("---PRIORITY QUEUE FILLING---\n");
 
 	PriorityQueue *pq = newPriorityQueue(sizeof(TreeNode));
 	for (int i = 0; i < size(v); i++) {
-		TreeNode *toAdd = newTreeNode(values[i]->value, sizeof(PQCell));
-		printTreeNode(toAdd, NULL);
-		addToPriorityQueue(pq, toAdd, values[i]->priority);
+		TreeNode *toAdd =
+			newTreeNode(values[i], sizeof(HuffmanPair), NULL, NULL);
+		addToPriorityQueue(pq, toAdd, values[i]->nbOccurrences);
 	}
 
-	LLCell *huffmanHeap = pq->first;
+	printf("---PRIORITY QUEUE FILLED---\n");
+	printPQ(pq);
 
-	while (huffmanHeap != NULL) {
-		printTreeNode(huffmanHeap->value, NULL);
-		huffmanHeap = huffmanHeap->next;
+	TreeNode *huffmanHeap = NULL;
+	while (!isLLEmpty(pq)) {
+		huffmanHeap = shiftFromPriorityQueue(pq);
+		if (!isLLEmpty(pq)) {
+			TreeNode *toMergeWith = shiftFromPriorityQueue(pq);
+			const HuffmanPair *hpOne = (const HuffmanPair *)huffmanHeap->value;
+			const HuffmanPair *hpTwo = (const HuffmanPair *)toMergeWith->value;
+			assert(hpOne && hpTwo && "null!");
+			const int priority = hpOne->nbOccurrences + hpTwo->nbOccurrences;
+			printf("%d + %d = %d\n", hpOne->nbOccurrences, hpTwo->nbOccurrences,
+				   priority);
+			const HuffmanPair nonLeaf = {'@', priority};
+			TreeNode *merged = newTreeNode(&nonLeaf, sizeof(HuffmanPair),
+										   huffmanHeap, toMergeWith);
+			addToPriorityQueue(pq, merged, priority);
+		}
 	}
-
-	// TreeNode *huffmanHeap = NULL;
-	// while (!isLLEmpty(pq)) {
-	// 	huffmanHeap = shift(pq);
-	// 	printTreeNode(huffmanHeap, NULL);
-	// 	if (!isLLEmpty(pq)) {
-	// 		TreeNode *toMergeWith = shift(pq);
-	// 		const unsigned char nonLeaf = EOF;
-	// 		const int priority = ((PQCell *)huffmanHeap->value)->priority +
-	// 							 ((PQCell *)toMergeWith->value)->priority;
-	// 		TreeNode *merged = newTreeNode(
-	// 			newPQCell(&nonLeaf, sizeof(unsigned char), priority),
-	// 			sizeof(PQCell));
-	// 		merged->left = huffmanHeap;
-	// 		merged->right = toMergeWith;
-	// 		addToPriorityQueue(pq, merged, priority);
-	// 	}
-	// }
-
-	// walk(huffmanHeap, INFIXE, printTreeNode, NULL);
+	printf("vvvvvvvvvvvvvvvvvvvvvvvvv\n");
+	prefixePrintInfo ppi = {0, printVoidHuffmanPair};
+	walk(huffmanHeap, PREFIXE, prefixPrint, &ppi);
 }
 
 void uncompress(FILE *dest, char *filename);

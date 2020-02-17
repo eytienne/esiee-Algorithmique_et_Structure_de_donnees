@@ -52,102 +52,50 @@ void freeTree(BSTree *t, void (*freeValue)(void *value)) {
 	t->nodecmp = NULL;
 }
 
-int __countTreeNodes(const TreeNode *t, void *counter) {
-	++*(int *)counter;
-	return WALK_SUCCESS;
-}
-
 int countTreeNodes(const BSTree *t) {
 	assert(t != NULL);
 	int counter = 0;
-	walkTree(t, INFIXE, __countTreeNodes, &counter);
+	walkTree(t, INFIXE, countTreeNodeNodes, &counter);
 	return counter;
-}
-
-typedef struct PrintInfo {
-	void (*printer)(const void *value);
-	int first;
-} PrintInfo;
-
-int __printTree(const TreeNode *t, void *pi) {
-	if (t == NULL)
-		return WALK_SUCCESS;
-	PrintInfo *cpi = (PrintInfo *)pi;
-	if (!cpi->first)
-		printf("\t");
-	cpi->printer(t->value);
-	if (cpi->first)
-		cpi->first = 0;
-	return WALK_SUCCESS;
 }
 
 void printTree(const BSTree *t, void (*printer)(const void *value)) {
 	assert(t != NULL);
 	PrintInfo pi = {printer, 1};
-	walkTree(t, INFIXE, __printTree, &pi);
+	walkTree(t, INFIXE, printTreeNode, &pi);
 	printf("\n");
-}
-
-void __printTree2(const TreeNode *t, void (*printer)(const void *value)) {
-	if (t == NULL) {
-		printf("_");
-		return;
-	}
-	printf("{");
-	__printTree2(t->left, printer);
-	printer(t->value);
-	__printTree2(t->right, printer);
-	printf("}");
 }
 
 void printTree2(const BSTree *t, void (*printer)(const void *value)) {
 	assert(t != NULL);
-	__printTree2(t->root, printer);
+	printTreeNode2(t->root, printer);
 	printf("\n");
 }
 
-typedef struct PrefixPrintInfo {
-	int nbTabs;
-	void (*printer)(const void *value);
-} PrefixPrintInfo;
 
-int __prefixePrint(const TreeNode *t, void *buffer) {
-	PrefixPrintInfo *ppi = (PrefixPrintInfo *)buffer;
-	for (int i = 0; i < ppi->nbTabs; i++)
-		printf("    ");
-	printf("\\---");
-	ppi->printer(t->value);
-	if (isLeaf(t))
-		ppi->nbTabs -= 1;
-	else
-		ppi->nbTabs += 1;
-	printf("\n");
-	return WALK_SUCCESS;
-}
-
-void prefixPrint(const BSTree *t, void (*printer)(const void *value)) {
-	PrefixPrintInfo ppi = {0, printer};
-	walkTree(t, PREFIXE, __prefixePrint, &ppi);
+void prefixPrintTree(const BSTree *t, void (*printer)(const void *value)) {
+	prefixePrintInfo ppi = {0, printer};
+	walkTree(t, PREFIXE, prefixPrint, &ppi);
 }
 
 void insertIntoTree(BSTree *t, const void *newValue) {
 	assert(t != NULL);
 	if (t->root == NULL) {
-		t->root = newTreeNode(newValue, t->sizeofEach);
+		t->root = newTreeNode(newValue, t->sizeofEach, NULL, NULL);
 		return;
 	}
 	TreeNode *cur = t->root;
 	while (1) {
 		if (t->nodecmp(newValue, cur->value) > 0) {
 			if (cur->right == NULL) {
-				cur->right = newTreeNode(newValue, t->sizeofEach);
+				cur->right = newTreeNode(newValue, t->sizeofEach, NULL, NULL);
 				return;
 			} else
 				cur = cur->right;
 		} else if (t->nodecmp(newValue, cur->value) <= 0) {
 
 			if (cur->left == NULL) {
-				cur->left = newTreeNode(newValue, t->sizeofEach);
+				cur->left = newTreeNode(newValue, t->sizeofEach, NULL, NULL);
 				return;
 			} else
 				cur = cur->left;
@@ -174,10 +122,6 @@ int transformTree(BSTree *t, enum PATHWAY p,
 	return walkTree(t, p, (int (*)(const TreeNode *, void *))function, buffer);
 }
 
-int isLeaf(const TreeNode *t) {
-	assert(t != NULL);
-	return t->left == NULL && t->right == NULL;
-}
 
 typedef struct CheckInfo {
 	void *last;

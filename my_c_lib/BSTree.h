@@ -23,7 +23,7 @@ void printTree(const BSTree *t, void (*printer)(const void *value));
 
 void printTree2(const BSTree *t, void (*printer)(const void *value));
 
-void prefixPrint(const BSTree *t, void (*printer)(const void *value));
+void prefixPrintTree(const BSTree *t, void (*printer)(const void *value));
 
 void insertIntoTree(BSTree *t, const void *newValue);
 
@@ -37,8 +37,6 @@ int walkTree(const BSTree *t, enum PATHWAY p,
 
 int transformTree(BSTree *t, enum PATHWAY p,
 			  int (*function)(TreeNode *, void *buffer), void *buffer);
-
-int isLeaf(const TreeNode *t);
 
 int isOrdered(const BSTree *t);
 

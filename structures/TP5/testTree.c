@@ -75,7 +75,7 @@ int main(int argc, char const *argv[]) {
 	printf("Nb noeuds : %d\n", nb);
 	assert(nb == 6);
 
-	prefixPrint(t, intprint);
+	prefixPrintTree(t, intprint);
 
 	freeTree(t, NULL);
 

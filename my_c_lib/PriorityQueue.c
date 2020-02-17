@@ -4,10 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int pq_cell_cmp(const void *c1, const void *c2) {
-	assert(c1 && c2 && "Arguments must not be null pointers.");
-	const PQCell *pq1 = *(const PQCell **)c1;
-	const PQCell *pq2 = *(const PQCell **)c2;
+int pq_cell_cmp(const PQCell *pq1, const PQCell *pq2) {
 	assert(pq1 && pq2 && "Null pointers not allowed for PQCell comparison.");
 	return pq1->priority - pq2->priority;
 }
@@ -43,15 +40,40 @@ void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 		newOne->previous = NULL;
 		newOne->next = NULL;
 		pq->first = pq->last = newOne;
+		printf("first first!\n");
 		return;
 	}
-
 	LLCell *cur = pq->first;
-	while (cur->next != NULL && pq_cell_cmp(&cur->value, &newOne->value) <= 0)
+	// tant que le nouveau est supérieur ou égal alors on passe
+	while (cur != NULL && pq_cell_cmp(newOne->value, cur->value) >= 0) {
+		printf("'%d\t'", ((PQCell *)cur->value)->priority);
 		cur = cur->next;
-	newOne->previous = cur;
-	newOne->next = cur->next;
-	if (cur == pq->last)
+	}
+
+	// cur is the one to insert before
+	if (cur == pq->first) { // insert as new first
+		newOne->next = pq->first;
+		pq->first->previous = newOne;
+		pq->first = newOne;
+		printf("new first!\n");
+	} else if (cur == NULL) { // insert as new last
+		newOne->previous = pq->last;
+		newOne->next = NULL;
+		pq->last->next = newOne;
 		pq->last = newOne;
-	newOne->next = cur->next;
+		printf("last!\n");
+	} else { // insert in the middle
+		newOne->previous = cur->previous;
+		cur->previous->next = newOne;
+		newOne->next = cur;
+		cur->previous = newOne;
+		printf("boom\n");
+	}
+}
+
+void *shiftFromPriorityQueue(PriorityQueue *pq) {
+	PQCell *toFree = shift(pq);
+	void *ret = toFree->value;
+	free(toFree);
+	return ret;
 }
