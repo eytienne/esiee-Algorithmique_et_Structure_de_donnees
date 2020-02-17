@@ -15,7 +15,7 @@ typedef struct HuffmanPair {
 } HuffmanPair;
 
 void printHuffmanPair(const HuffmanPair *hp) {
-	printf("hp: ['%c' (%d)]", hp->c, hp->nbOccurrences);
+	printf("['%c',%d]", hp->c, hp->nbOccurrences);
 }
 
 void printVoidHuffmanPair(const void *e) {
@@ -26,9 +26,22 @@ void printVoidHuffmanPair(const void *e) {
 int printTN(const TreeNode *tn, void *buffer) {
 	const HuffmanPair *uc = (const HuffmanPair *)tn->value;
 	assert(uc && "Null value node !");
-	printHuffmanPair(uc);
+	if (isLeaf(tn))
+		printHuffmanPair(uc);
 	printf("\n");
 	return WALK_SUCCESS;
+}
+
+void printPQPriorities(const PriorityQueue *pq) {
+	LLCell *cur = pq->first;
+	while (cur != NULL) {
+		const PQCell *curPQC = (const PQCell *)cur->value;
+		const TreeNode *curTN = (const TreeNode *)curPQC->value;
+		const HuffmanPair *curHP = (const HuffmanPair *)curTN->value;
+		printf("%d\t", curHP->nbOccurrences);
+		cur = cur->next;
+	}
+	printf("\n");
 }
 
 void printPQ(const PriorityQueue *pq) {
@@ -38,7 +51,6 @@ void printPQ(const PriorityQueue *pq) {
 		const PQCell *curPQC = (const PQCell *)cur->value;
 		const TreeNode *curTN = (const TreeNode *)curPQC->value;
 		const HuffmanPair *curHP = (const HuffmanPair *)curTN->value;
-		// printf("pqc:%p tn:%p  %p", curPQC, curTN, curHP);
 		printHuffmanPair(curHP);
 		if (cur == pq->first)
 			printf(" <-- first ");
@@ -75,13 +87,15 @@ void compress(FILE *src, char *filename) {
 		while (i < TAILLE_MAX) {
 			if (buffer[i] == '\0')
 				break;
-			printf("%d '%c'\n", i, buffer[i]);
+			printf("%c", buffer[i]);
+			// printf("%d '%c'\n", i, buffer[i]);
 			counters[buffer[i]]++;
 			if (buffer[i] == '\n')
 				break;
 			i++;
 		}
 	}
+	printf("\n");
 
 	Vector *v = malloc(sizeof(Vector));
 	create(v, sizeof(HuffmanPair));
@@ -111,6 +125,7 @@ void compress(FILE *src, char *filename) {
 
 	TreeNode *huffmanHeap = NULL;
 	while (!isLLEmpty(pq)) {
+		printPQPriorities(pq);
 		huffmanHeap = shiftFromPriorityQueue(pq);
 		if (!isLLEmpty(pq)) {
 			TreeNode *toMergeWith = shiftFromPriorityQueue(pq);
@@ -118,16 +133,27 @@ void compress(FILE *src, char *filename) {
 			const HuffmanPair *hpTwo = (const HuffmanPair *)toMergeWith->value;
 			assert(hpOne && hpTwo && "null!");
 			const int priority = hpOne->nbOccurrences + hpTwo->nbOccurrences;
-			printf("%d + %d = %d\n", hpOne->nbOccurrences, hpTwo->nbOccurrences,
-				   priority);
+			// printf("%d + %d = %d\n", hpOne->nbOccurrences,
+			// hpTwo->nbOccurrences, 	   priority);
 			const HuffmanPair nonLeaf = {'@', priority};
 			TreeNode *merged = newTreeNode(&nonLeaf, sizeof(HuffmanPair),
 										   huffmanHeap, toMergeWith);
+			assert(merged->left == huffmanHeap);
+			assert(merged->right == toMergeWith);
+
+			prefixePrintInfo ppi = {-1, printVoidHuffmanPair};
+			walk(merged, PREFIXE, prefixPrint, &ppi);
+			// printTreeNode2(merged, printVoidHuffmanPair);
+			// PrintInfo pi = {printVoidHuffmanPair, 1};
+			// walk(merged, INFIXE, printTreeNode, &pi);
+			// walk(merged, INFIXE, printTN, NULL);
+
+			printf("\n\n");
 			addToPriorityQueue(pq, merged, priority);
 		}
 	}
 	printf("vvvvvvvvvvvvvvvvvvvvvvvvv\n");
-	prefixePrintInfo ppi = {0, printVoidHuffmanPair};
+	prefixePrintInfo ppi = {-1, printVoidHuffmanPair};
 	walk(huffmanHeap, PREFIXE, prefixPrint, &ppi);
 }
 

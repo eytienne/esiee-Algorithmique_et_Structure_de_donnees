@@ -46,7 +46,7 @@ void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 	LLCell *cur = pq->first;
 	// tant que le nouveau est supérieur ou égal alors on passe
 	while (cur != NULL && pq_cell_cmp(newOne->value, cur->value) >= 0) {
-		printf("'%d\t'", ((PQCell *)cur->value)->priority);
+		// printf("%d\t", ((PQCell *)cur->value)->priority);
 		cur = cur->next;
 	}
 

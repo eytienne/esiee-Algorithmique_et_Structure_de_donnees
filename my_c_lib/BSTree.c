@@ -74,7 +74,7 @@ void printTree2(const BSTree *t, void (*printer)(const void *value)) {
 
 
 void prefixPrintTree(const BSTree *t, void (*printer)(const void *value)) {
-	prefixePrintInfo ppi = {0, printer};
+	prefixePrintInfo ppi = {-1, printer};
 	walkTree(t, PREFIXE, prefixPrint, &ppi);
 }
 
