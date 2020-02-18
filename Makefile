@@ -20,6 +20,7 @@ testTree: compileTreeTest
 compileTreeTest:
 	gcc \
 		my_c_lib/*Tree*.c \
+		my_c_lib/BinaryPath.c \
 		my_c_lib/ShallowStack.c \
-		structures/TP5/testTree.c \
+		structures/TP5/testTree2.c \
 		-o main \

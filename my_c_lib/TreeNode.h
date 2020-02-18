@@ -1,8 +1,8 @@
 #ifndef TREE_NODE_H
 #define TREE_NODE_H
 
-#include "ShallowStack.h"
 #include "BinaryPath.h"
+#include "ShallowStack.h"
 #include <stddef.h>
 
 typedef struct TreeNode {
@@ -18,6 +18,8 @@ TreeNode *newTreeNode(const void *value, size_t size, TreeNode *left,
 					  TreeNode *right);
 
 int isLeaf(const TreeNode *t);
+
+int isParent(const TreeNode *from, const TreeNode *it);
 
 int walkWithPath(const TreeNode *root, enum PATHWAY p,
 				 int (*function)(const TreeNode *, void *buffer,

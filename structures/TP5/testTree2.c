@@ -20,23 +20,24 @@ int main(int argc, char const *argv[]) {
 	assert(t->sizeofEach = sizeof(int));
 	assert(t->nodecmp == intcmp);
     
-	int value = 10;
+	int value = 5;
 	insertIntoTree(t, &value);
-	value = 13;
+	value = 3;
 	insertIntoTree(t, &value);
-	value = 9;
-	insertIntoTree(t, &value);
-	value = 6;
-	insertIntoTree(t, &value);
-	value = 7;
+	value = 1;
 	insertIntoTree(t, &value);
 	value = 4;
 	insertIntoTree(t, &value);
-	value = 5;
+	value = 8;
 	insertIntoTree(t, &value);
-	value = 2;
+	value = 7;
+	insertIntoTree(t, &value);
+	value = 10;
+	insertIntoTree(t, &value);
+	value = 12;
 	insertIntoTree(t, &value);
 
     printTree(t, intprint);
 
+	prefixPrintTree(t, intprint);
 }

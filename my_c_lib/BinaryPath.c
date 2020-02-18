@@ -9,6 +9,7 @@ BinaryPath *newBinaryPath() {
 	BinaryPath *newOne = malloc(sizeof(BinaryPath));
 	newOne->bits = NULL;
 	newOne->length = 0;
+	return newOne;
 }
 
 void __goTo(BinaryPath *bp, enum DIRECTION d) {

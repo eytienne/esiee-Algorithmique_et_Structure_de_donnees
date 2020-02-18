@@ -23,6 +23,58 @@ int isLeaf(const TreeNode *t) {
 	return t->left == NULL && t->right == NULL;
 }
 
+int isParent(const TreeNode *from, const TreeNode *it) {
+	return from == it->left || from == it->right;
+}
+
+typedef struct WalkWithPathInfo {
+	BinaryPath *bp;
+	ShallowStack *parents;
+	int (*function)(const TreeNode *, void *buffer, const BinaryPath *bp);
+	void *buffer;
+} WalkWithPathInfo;
+
+int __walkWithPath(const TreeNode *tn, void *buffer) {
+
+	assert(buffer != NULL);
+	WalkWithPathInfo *wwpi = (WalkWithPathInfo *)buffer;
+
+	const TreeNode *last =
+		!isSSEmpty(wwpi->parents) ? top(wwpi->parents) : NULL;
+	if (last)
+		printf("last %d\n", *(int *)last->value);
+
+	while (!isSSEmpty(wwpi->parents) && !isParent(tn, last)) {
+		unsstack(wwpi->parents);
+		goBack(wwpi->bp);
+		last = !isSSEmpty(wwpi->parents) ? top(wwpi->parents) : NULL;
+	}
+	// printf("step2\n");
+	if (last != NULL) {
+		if (last->left == tn) {
+			goToLeft(wwpi->bp);
+		} else if (last->right == tn) {
+			goToRight(wwpi->bp);
+		}
+	}
+
+	if (wwpi->function(tn, wwpi->buffer, wwpi->bp))
+		return WALK_FAILURE;
+
+	sstack(wwpi->parents, tn);
+
+	return WALK_SUCCESS;
+}
+
+int walkWithPath(const TreeNode *root, enum PATHWAY p,
+				 int (*function)(const TreeNode *, void *buffer,
+								 const BinaryPath *bp),
+				 void *buffer) {
+	BinaryPath *bp = newBinaryPath();
+	WalkWithPathInfo wwpi = {bp, newShallowStack(), function, buffer};
+	return walk(root, p, __walkWithPath, &wwpi);
+}
+
 int postfixWalk_rec(const TreeNode *tn,
 					int (*function)(const TreeNode *, void *buffer),
 					void *buffer) {
@@ -35,45 +87,6 @@ int postfixWalk_rec(const TreeNode *tn,
 	if (function(tn, buffer))
 		return WALK_FAILURE;
 	return WALK_SUCCESS;
-}
-
-typedef struct WalkWithPathInfo {
-	BinaryPath *bp;
-	const TreeNode *last;
-	int (*function)(const TreeNode *, void *buffer, const BinaryPath *bp);
-	void *buffer;
-} WalkWithPathInfo;
-
-int __walkWithPath(const TreeNode *tn, void *buffer) {
-	
-	assert(buffer != NULL);
-	WalkWithPathInfo *wwpi = (WalkWithPathInfo *)buffer;
-	
-	if (wwpi->last != NULL) {
-		if (wwpi->last->left == tn) {
-			goToLeft(wwpi->bp);
-		} else if (wwpi->last->left == tn) {
-			goToRight(wwpi->bp);
-		} else {
-			goBack(wwpi->bp);
-		}
-	}
-	
-	if (wwpi->function(tn, wwpi->buffer, wwpi->bp))
-		return WALK_FAILURE;
-	
-	wwpi->last = tn;
-	
-	return WALK_SUCCESS;
-}
-
-int walkWithPath(const TreeNode *root, enum PATHWAY p,
-				 int (*function)(const TreeNode *, void *buffer,
-								 const BinaryPath *bp),
-				 void *buffer) {
-	BinaryPath *bp = newBinaryPath();
-	WalkWithPathInfo wwpi = {bp, NULL, function, buffer};
-	return walk(root, p, __walkWithPath, &wwpi);
 }
 
 int walk(const TreeNode *root, enum PATHWAY p,

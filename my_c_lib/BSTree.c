@@ -73,7 +73,7 @@ void printTree2(const BSTree *t, void (*printer)(const void *value)) {
 }
 
 void prefixPrintTree(const BSTree *t, void (*printer)(const void *value)) {
-	walkTree(t, PREFIXE, prefixPrint, printer);
+	walkTreeWithPath(t, PREFIXE, prefixPrint, printer);
 }
 
 void insertIntoTree(BSTree *t, const void *newValue) {
@@ -109,11 +109,12 @@ const TreeNode *findTreeNode(BSTree *t, const void *value) {
 	return ret;
 }
 
-int walkTree(const BSTree *t, enum PATHWAY p,
-			 int (*function)(const TreeNode *, void *buffer,
-							 const BinaryPath *bp),
-			 void *buffer) {
-	walkWithPath(t->root, p, function, buffer);
+int walkTreeWithPath(const BSTree *t, enum PATHWAY p,
+					 int (*function)(const TreeNode *, void *buffer,
+									 const BinaryPath *bp),
+					 void *buffer) {
+	assert(t != NULL);
+	return walkWithPath(t->root, p, function, buffer);
 }
 
 int walkTree(const BSTree *t, enum PATHWAY p,

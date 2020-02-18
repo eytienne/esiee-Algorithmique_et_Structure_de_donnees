@@ -13,7 +13,7 @@ typedef struct BSTree {
 enum BST_CHECK { ISBST = WALK_SUCCESS, ISNOTBST = WALK_FAILURE };
 
 BSTree *newTree(size_t sizeofEach,
-			  int (*nodecmp)(const void *newValue, const void *existing));
+				int (*nodecmp)(const void *newValue, const void *existing));
 
 void freeTree(BSTree *t, void (*freeValue)(void *value));
 
@@ -29,15 +29,21 @@ void insertIntoTree(BSTree *t, const void *newValue);
 
 const TreeNode *findTreeNode(BSTree *t, const void *value);
 
+int walkTreeWithPath(const BSTree *t, enum PATHWAY p,
+					 int (*function)(const TreeNode *, void *buffer,
+									 const BinaryPath *bp),
+					 void *buffer);
+
 int walkTree(const BSTree *t, enum PATHWAY p,
-		 int (*function)(const TreeNode *, void *buffer), void *buffer);
+			 int (*function)(const TreeNode *, void *buffer), void *buffer);
 
 int transformTree(BSTree *t, enum PATHWAY p,
-			  int (*function)(TreeNode *, void *buffer), void *buffer);
+				  int (*function)(TreeNode *, void *buffer), void *buffer);
 
 int isOrdered(const BSTree *t);
 
-void **treeSort(void **src, int n, size_t size, int (*nodecmp)(const void *newValue, const void *existing));
+void **treeSort(void **src, int n, size_t size,
+				int (*nodecmp)(const void *newValue, const void *existing));
 
 void deleteFromTree(BSTree *t, const void *oldValue);
 
