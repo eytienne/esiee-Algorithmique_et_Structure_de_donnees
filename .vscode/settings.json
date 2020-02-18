@@ -1,6 +1,6 @@
 {
-    "C_Cpp.clang_format_style": "{ UseTab: Always, IndentWidth: 4, TabWidth: 4, ColumnLimit: 80 }",
+    "C_Cpp.clang_format_style": "file",
     "files.associations": {
-        "treenode.h": "c"
+        "*.h": "c",
     }
 }
