@@ -18,7 +18,7 @@ PQCell *newPQCell(const void *e, size_t size, int priority) {
 }
 
 PriorityQueue *newPriorityQueue(size_t sizeofEach) {
-	PriorityQueue *newOne = newLinkedList(sizeof(PQCell));
+	return newLinkedList(sizeof(PQCell));
 }
 
 void freePQCell(void *value, void *buffer) {
@@ -45,7 +45,8 @@ void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 	}
 	LLCell *cur = pq->first;
 	// tant que le nouveau est supérieur ou égal alors on passe
-	while (cur != NULL && pq_cell_cmp(newOne->value, cur->value) >= 0) {
+	while (cur != NULL && pq_cell_cmp((const PQCell *)newOne->value,
+									  (const PQCell *)cur->value) >= 0) {
 		cur = cur->next;
 	}
 	if (cur == pq->first) { // insert as new first

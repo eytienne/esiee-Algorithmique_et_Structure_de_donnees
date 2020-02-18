@@ -15,7 +15,7 @@ typedef struct HuffmanPair {
 } HuffmanPair;
 
 void printHuffmanPair(const HuffmanPair *hp) {
-	printf("['%c',%d]", hp->c, hp->nbOccurrences);
+	printf("['%c',%u]", hp->c, hp->nbOccurrences);
 }
 
 void printVoidHuffmanPair(const void *e) {
@@ -83,7 +83,7 @@ void compress(FILE *src, char *filename) {
 	unsigned char *buffer = malloc(sizeof(TAILLE_MAX));
 	int *counters = calloc(ASCII_TABLE_SIZE, sizeof(int));
 
-	while (!feof(src) && fgets(buffer, TAILLE_MAX, src) != NULL) {
+	while (!feof(src) && fgets((char *)buffer, TAILLE_MAX, src) != NULL) {
 		int i = 0;
 		while (i < TAILLE_MAX) {
 			if (buffer[i] == '\0')
@@ -133,17 +133,11 @@ void compress(FILE *src, char *filename) {
 			const HuffmanPair *hpTwo = (const HuffmanPair *)toMergeWith->value;
 			assert(hpOne && hpTwo && "null!");
 			const int priority = hpOne->nbOccurrences + hpTwo->nbOccurrences;
-			// printf("%d + %d = %d\n", hpOne->nbOccurrences,
-			// hpTwo->nbOccurrences, 	   priority);
 			const HuffmanPair nonLeaf = {'@', priority};
 			TreeNode *merged = newTreeNode(&nonLeaf, sizeof(HuffmanPair),
 										   huffmanHeap, toMergeWith);
 			assert(merged->left == huffmanHeap);
 			assert(merged->right == toMergeWith);
-
-			// printHuffmanPair(huffmanHeap->value);
-			// printHuffmanPair(toMergeWith->value);
-			// printf("\n");
 
 			walkWithPath(merged, PREFIXE, prefixPrint, printHuffmanPair);
 

@@ -1,9 +1,11 @@
 #include "Cell.h"
 #include <string.h>
+#include <stdlib.h>
 
 Cell *cellcpy(Cell *dest, const Cell *src) {
 	dest->size = src->size;
 	memcpy(dest->value, src->value, src->size);
+    return dest;
 }
 
 int cellcmp(const Cell *c1, const Cell *c2){

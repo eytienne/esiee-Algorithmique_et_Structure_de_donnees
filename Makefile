@@ -14,6 +14,18 @@ compileProject:
 		structures/PROJET/main.c \
 		-o main
 
+checkProject:
+	frama-c \
+		my_c_lib/BinaryPath.c \
+		my_c_lib/LinkedList.c \
+		my_c_lib/Queue.c \
+		my_c_lib/PriorityQueue.c \
+		my_c_lib/ShallowStack.c \
+		my_c_lib/TreeNode.c \
+		my_c_lib/Vector.c \
+		structures/PROJET/compression.c \
+		structures/PROJET/main.c \
+
 testTree: compileTreeTest
 	./main
 

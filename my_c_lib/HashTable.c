@@ -2,6 +2,7 @@
 #include "LinkedList.h"
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct KeyValuePair {
 	char *key;
