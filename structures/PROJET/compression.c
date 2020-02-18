@@ -32,13 +32,13 @@ int printTN(const TreeNode *tn, void *buffer) {
 	return WALK_SUCCESS;
 }
 
-void printPQPriorities(const PriorityQueue *pq) {
+void printPQTN(const PriorityQueue *pq) {
 	LLCell *cur = pq->first;
 	while (cur != NULL) {
 		const PQCell *curPQC = (const PQCell *)cur->value;
 		const TreeNode *curTN = (const TreeNode *)curPQC->value;
 		const HuffmanPair *curHP = (const HuffmanPair *)curTN->value;
-		printf("%d\t", curHP->nbOccurrences);
+		printHuffmanPair(curHP);
 		cur = cur->next;
 	}
 	printf("\n");
@@ -67,6 +67,7 @@ void printVectorOfHP(const Vector *v) {
 	for (int i = 0; i < size(v); i++) {
 		const HuffmanPair *cc = v->values[i];
 		printHuffmanPair(cc);
+		printf("\n");
 	}
 }
 
@@ -106,7 +107,7 @@ void compress(FILE *src, char *filename) {
 		}
 	}
 	qsort(v->values, size(v), sizeof(void *), huffman_pair_cmp);
-	// printVectorOfHP(v);
+	printVectorOfHP(v);
 	printf("----------------------\n");
 
 	HuffmanPair **values = (HuffmanPair **)v->values;
@@ -125,7 +126,7 @@ void compress(FILE *src, char *filename) {
 
 	TreeNode *huffmanHeap = NULL;
 	while (!isLLEmpty(pq)) {
-		printPQPriorities(pq);
+		printPQTN(pq);
 		huffmanHeap = shiftFromPriorityQueue(pq);
 		printPQ(pq);
 		if (!isLLEmpty(pq)) {
@@ -142,8 +143,11 @@ void compress(FILE *src, char *filename) {
 			assert(merged->left == huffmanHeap);
 			assert(merged->right == toMergeWith);
 
-			prefixePrintInfo ppi = {-1, printVoidHuffmanPair};
-			walk(merged, PREFIXE, prefixPrint, &ppi);
+			printHuffmanPair(huffmanHeap->value);
+			printHuffmanPair(toMergeWith->value);
+			printf("\n");
+			
+			walkWithPath(merged, PREFIXE, prefixPrint, printHuffmanPair);
 			// printTreeNode2(merged, printVoidHuffmanPair);
 			// PrintInfo pi = {printVoidHuffmanPair, 1};
 			// walk(merged, INFIXE, printTreeNode, &pi);
@@ -154,8 +158,7 @@ void compress(FILE *src, char *filename) {
 		}
 	}
 	printf("vvvvvvvvvvvvvvvvvvvvvvvvv\n");
-	prefixePrintInfo ppi = {-1, printVoidHuffmanPair};
-	walk(huffmanHeap, PREFIXE, prefixPrint, &ppi);
+	walkWithPath(huffmanHeap, PREFIXE, prefixPrint, printHuffmanPair);
 }
 
 void uncompress(FILE *dest, char *filename);

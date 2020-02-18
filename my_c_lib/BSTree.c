@@ -24,7 +24,7 @@ TreeNode **findNodeWithParent(BSTree *t, const void *value) {
 }
 
 BSTree *newTree(size_t sizeofEach,
-			  int (*nodecmp)(const void *newValue, const void *existing)) {
+				int (*nodecmp)(const void *newValue, const void *existing)) {
 	assert(sizeofEach > 0);
 	assert(nodecmp != NULL);
 	BSTree *newOne = (BSTree *)malloc(sizeof(BSTree));
@@ -72,10 +72,8 @@ void printTree2(const BSTree *t, void (*printer)(const void *value)) {
 	printf("\n");
 }
 
-
 void prefixPrintTree(const BSTree *t, void (*printer)(const void *value)) {
-	prefixePrintInfo ppi = {-1, printer};
-	walkTree(t, PREFIXE, prefixPrint, &ppi);
+	walkTree(t, PREFIXE, prefixPrint, printer);
 }
 
 void insertIntoTree(BSTree *t, const void *newValue) {
@@ -112,6 +110,13 @@ const TreeNode *findTreeNode(BSTree *t, const void *value) {
 }
 
 int walkTree(const BSTree *t, enum PATHWAY p,
+			 int (*function)(const TreeNode *, void *buffer,
+							 const BinaryPath *bp),
+			 void *buffer) {
+	walkWithPath(t->root, p, function, buffer);
+}
+
+int walkTree(const BSTree *t, enum PATHWAY p,
 			 int (*function)(const TreeNode *, void *buffer), void *buffer) {
 	assert(t != NULL);
 	return walk(t->root, p, function, buffer);
@@ -122,7 +127,6 @@ int transformTree(BSTree *t, enum PATHWAY p,
 	return walkTree(t, p, (int (*)(const TreeNode *, void *))function, buffer);
 }
 
-
 typedef struct CheckInfo {
 	void *last;
 	int (*cmpFunc)(const void *value, const void *existing);
@@ -130,9 +134,8 @@ typedef struct CheckInfo {
 
 int __isOrdered(const TreeNode *t, void *buffer) {
 	CheckInfo *ci = (CheckInfo *)buffer;
-	if (ci->last != NULL && ci->cmpFunc(t->value, ci->last) < 0) {
+	if (ci->last != NULL && ci->cmpFunc(t->value, ci->last) < 0)
 		return ISNOTBST;
-	}
 	ci->last = t->value;
 	return ISBST;
 }
@@ -156,10 +159,14 @@ int __treeSort(const TreeNode *t, void *si) {
 	if (t == NULL)
 		return WALK_SUCCESS;
 	SortInfo *csi = (SortInfo *)si;
+	printf("%d : %d\n", csi->index, *(int *)t->value);
 	memcpy(csi->dest[csi->index], t->value, csi->size);
+	printf("%d\n", csi->index);
 	csi->index++;
 	return WALK_SUCCESS;
 }
+
+void intprint(const void *v);
 
 void **treeSort(void **src, int n, size_t size,
 				int (*nodecmp)(const void *newValue, const void *existing)) {
@@ -179,7 +186,9 @@ void **treeSort(void **src, int n, size_t size,
 		si.dest[i] = malloc(t->sizeofEach);
 	si.index = 0;
 	si.size = t->sizeofEach;
+
 	int failed = walkTree(t, INFIXE, __treeSort, &si);
+
 	void **ret = si.dest;
 	if (failed) {
 		free(ret);

@@ -1,6 +1,7 @@
 #include "BinaryPath.h"
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 enum DIRECTION { LEFT, RIGHT };
 

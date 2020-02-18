@@ -1,6 +1,8 @@
 #ifndef TREE_NODE_H
 #define TREE_NODE_H
 
+#include "ShallowStack.h"
+#include "BinaryPath.h"
 #include <stddef.h>
 
 typedef struct TreeNode {
@@ -17,6 +19,11 @@ TreeNode *newTreeNode(const void *value, size_t size, TreeNode *left,
 
 int isLeaf(const TreeNode *t);
 
+int walkWithPath(const TreeNode *root, enum PATHWAY p,
+				 int (*function)(const TreeNode *, void *buffer,
+								 const BinaryPath *bp),
+				 void *buffer);
+
 int walk(const TreeNode *t, enum PATHWAY p,
 		 int (*function)(const TreeNode *, void *buffer), void *buffer);
 
@@ -31,11 +38,6 @@ int printTreeNode(const TreeNode *t, void *pi);
 
 void printTreeNode2(const TreeNode *t, void (*printer)(const void *value));
 
-typedef struct prefixePrintInfo {
-	int nbTabs;
-	void (*printer)(const void *value);
-} prefixePrintInfo;
-
-int prefixPrint(const TreeNode *t, void *buffer);
+int prefixPrint(const TreeNode *t, void *buffer, const BinaryPath *bp);
 
 #endif

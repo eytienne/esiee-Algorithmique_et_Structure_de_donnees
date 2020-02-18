@@ -1,11 +1,16 @@
+
 #include "../../my_c_lib/BSTree.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-int intcmp(const void *c1, const void *c2) { return *(int *)c1 - *(int *)c2; }
+int intcmp(const void *c1, const void *c2) {
+	return *(int *)c1 - *(int *)c2;
+}
 
-void intprint(const void *v) { printf("%d", *(int *)v); }
+void intprint(const void *v) {
+	printf("%d", *(int *)v);
+}
 
 int main(int argc, char const *argv[]) {
 
@@ -42,6 +47,7 @@ int main(int argc, char const *argv[]) {
 
 	int newRoot = 0;
 	t->root->value = &newRoot;
+	printTree(t, intprint);
 	int badWalk = isOrdered(t);
 	assert(badWalk);
 
@@ -58,6 +64,7 @@ int main(int argc, char const *argv[]) {
 	*sortThis[2] = 4;
 	*sortThis[3] = 8;
 	*sortThis[4] = 2;
+
 	int **sorted = (int **)treeSort((void **)sortThis, 5, sizeof(int), intcmp);
 	for (size_t i = 0; i < 5; i++) {
 		if (i > 0)
@@ -72,7 +79,7 @@ int main(int argc, char const *argv[]) {
 	assert(intcmp(t->root->value, &value) == 0);
 	printTree2(t, intprint);
 	nb = countTreeNodes(t);
-	printf("Nb noeuds : %d\n", nb);
+	printf("Nb noeuds: %d\n", nb);
 	assert(nb == 6);
 
 	prefixPrintTree(t, intprint);
