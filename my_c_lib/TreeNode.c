@@ -41,15 +41,13 @@ int __walkWithPath(const TreeNode *tn, void *buffer) {
 
 	const TreeNode *last =
 		!isSSEmpty(wwpi->parents) ? top(wwpi->parents) : NULL;
-	if (last)
-		printf("last %d\n", *(int *)last->value);
 
 	while (!isSSEmpty(wwpi->parents) && !isParent(tn, last)) {
 		unsstack(wwpi->parents);
 		goBack(wwpi->bp);
 		last = !isSSEmpty(wwpi->parents) ? top(wwpi->parents) : NULL;
 	}
-	// printf("step2\n");
+
 	if (last != NULL) {
 		if (last->left == tn) {
 			goToLeft(wwpi->bp);
@@ -74,6 +72,20 @@ int walkWithPath(const TreeNode *root, enum PATHWAY p,
 	WalkWithPathInfo wwpi = {bp, newShallowStack(), function, buffer};
 	return walk(root, p, __walkWithPath, &wwpi);
 }
+
+// int prefixWalk_rec(const TreeNode *tn,
+// 					int (*function)(const TreeNode *, void *buffer),
+// 					void *buffer) {
+// 	if (tn == NULL)
+// 		return WALK_SUCCESS;
+// 	if (function(tn, buffer))
+// 		return WALK_FAILURE;
+// 	if (prefixWalk_rec(tn->left, function, buffer))
+// 		return WALK_FAILURE;
+// 	if (prefixWalk_rec(tn->right, function, buffer))
+// 		return WALK_FAILURE;
+// 	return WALK_SUCCESS;
+// }
 
 int postfixWalk_rec(const TreeNode *tn,
 					int (*function)(const TreeNode *, void *buffer),
@@ -107,6 +119,7 @@ int walk(const TreeNode *root, enum PATHWAY p,
 				return WALK_FAILURE;
 			sstack(toVisit, cur->right);
 			sstack(toVisit, cur->left);
+			// return prefixWalk_rec(cur, function, buffer);
 			break;
 		case INFIXE:
 			// left angle
@@ -204,9 +217,10 @@ int prefixPrint(const TreeNode *t, void *buffer, const BinaryPath *bp) {
 	assert(buffer != NULL);
 	void (*printer)(const void *) = (void (*)(const void *))buffer;
 
-	for (int i = 0; i < bp->length; i++)
+	for (int i = 1; i < bp->length; i++)
 		printf("\t");
-	printf("\\---");
+	if (bp->length > 0)
+		printf("\\--%d--", getBPStep(bp, bp->length - 1));
 	printer(t->value);
 	printf("\n");
 

@@ -40,7 +40,7 @@ void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 		newOne->previous = NULL;
 		newOne->next = NULL;
 		pq->first = pq->last = newOne;
-		printf("first first!\n");
+		// printf("first first!\n");
 		return;
 	}
 	LLCell *cur = pq->first;
@@ -53,19 +53,19 @@ void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 		newOne->next = pq->first;
 		pq->first->previous = newOne;
 		pq->first = newOne;
-		printf("new first!\n");
+		// printf("new first!\n");
 	} else if (cur == NULL) { // insert as new last
 		newOne->previous = pq->last;
 		newOne->next = NULL;
 		pq->last->next = newOne;
 		pq->last = newOne;
-		printf("last!\n");
+		// printf("last!\n");
 	} else { // insert in the middle
 		newOne->previous = cur->previous;
 		cur->previous->next = newOne;
 		newOne->next = cur;
 		cur->previous = newOne;
-		printf("boom\n");
+		// printf("boom\n");
 	}
 }
 
