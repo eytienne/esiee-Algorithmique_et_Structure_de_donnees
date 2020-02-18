@@ -1,46 +1,39 @@
-/*******************************************************************************
- *  Objectif : Tester la pile d'entiers
- ******************************************************************************/
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
-#include "../../../my_c_lib/Pile.h"
+#include "../../../my_c_lib/ShallowStack.h"
 
-int main()
-{
-    Pile pile;
+int main() {
 
-    /* Initialiser la pile */
-    initialiser(&pile);
-    assert(est_vide(pile));
+	ShallowStack *pile = newShallowStack();
 
-    /* Empiler un premier �l�ment */
-    empiler(&pile, 'A');
-    assert(! est_vide(pile));
-    assert(sommet(pile) == 'A');
+	assert(isSSEmpty(pile));
 
-    /* Empiler un deuxi�me �l�ment */
-    empiler(&pile, 'B');
-    assert(! est_vide(pile));
-    assert(sommet(pile) == 'B');
+	char *toStack = "ABC";
+	sstack(pile, toStack);
+	assert(!isSSEmpty(pile));
+	assert(*(char *)top(pile) == 'A');
 
-    /* Empiler un troisi�me �l�ment */
-    empiler(&pile, 'C');
-    assert(! est_vide(pile));
-    assert(sommet(pile) == 'C');
+	sstack(pile, toStack + 1);
+	assert(!isSSEmpty(pile));
+	assert(*(char *)top(pile) == 'B');
 
-    /* D�piler tous les �l�ments */
-    depiler(&pile);
-    assert(! est_vide(pile));
-    assert(sommet(pile) == 'B');
-    depiler(&pile);
-    assert(! est_vide(pile));
-    assert(sommet(pile) == 'A');
-    depiler(&pile);
-    assert(est_vide(pile));
+	sstack(pile, toStack + 2);
+	assert(!isSSEmpty(pile));
+	assert(*(char *)top(pile) == 'C');
 
-    return EXIT_SUCCESS;
+	unsstack(pile);
+	assert(!isSSEmpty(pile));
+	assert(*(char *)top(pile) == 'B');
+	unsstack(pile);
+	assert(!isSSEmpty(pile));
+	assert(*(char *)top(pile) == 'A');
+	unsstack(pile);
+	assert(isSSEmpty(pile));
+
+	printf("Tests passed!\n");
+
+	return EXIT_SUCCESS;
 }
-
