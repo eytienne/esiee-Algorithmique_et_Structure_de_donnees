@@ -14,6 +14,10 @@ typedef struct HuffmanPair {
 	unsigned int nbOccurrences;
 } HuffmanPair;
 
+void printHuffmanPairChar(const HuffmanPair *hp) {
+	printf("'%c'", hp->c);
+}
+
 void printHuffmanPair(const HuffmanPair *hp) {
 	printf("['%c',%u]", hp->c, hp->nbOccurrences);
 	// printf("%p['%c',%u]", hp, hp->c, hp->nbOccurrences);
@@ -30,6 +34,21 @@ int printTN(const TreeNode *tn, void *buffer) {
 	if (isLeaf(tn))
 		printHuffmanPair(uc);
 	printf("\n");
+	return WALK_SUCCESS;
+}
+
+int printLeavesWithBPaths(const TreeNode *t, void *buffer,
+						  const BinaryPath *bp) {
+	assert(buffer != NULL);
+	void (*printer)(const void *) = (void (*)(const void *))buffer;
+
+	if (isLeaf(t)) {
+		printer(t->value);
+		printf(" -> ");
+		printBinaryPath(bp);
+		printf("\n");
+	}
+
 	return WALK_SUCCESS;
 }
 
@@ -149,6 +168,9 @@ void compress(FILE *src, char *filename) {
 			printf("____________________\n");
 			walkWithPath(merged, PREFIXE, prefixPrint, printHuffmanPair);
 
+			walkWithPath(huffmanHeap, PREFIXE, printLeavesWithBPaths,
+						 printHuffmanPairChar);
+
 			addToPriorityQueue(pq, merged, priority);
 		}
 	}
@@ -157,6 +179,9 @@ void compress(FILE *src, char *filename) {
 	walk(huffmanHeap, PREFIXE, printTreeNode, &pi);
 	printf("\nvvvvvvvvvvvvvvvvvvvvvvvvv\n");
 	walkWithPath(huffmanHeap, PREFIXE, prefixPrint, printHuffmanPair);
+
+	walkWithPath(huffmanHeap, PREFIXE, printLeavesWithBPaths,
+				 printHuffmanPairChar);
 }
 
 void uncompress(FILE *dest, char *filename);

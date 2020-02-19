@@ -24,9 +24,13 @@ void __goTo(BinaryPath *bp, enum DIRECTION d) {
 	bp->length++;
 }
 
-void goToLeft(BinaryPath *bp) { __goTo(bp, LEFT); }
+void goToLeft(BinaryPath *bp) {
+	__goTo(bp, LEFT);
+}
 
-void goToRight(BinaryPath *bp) { __goTo(bp, RIGHT); }
+void goToRight(BinaryPath *bp) {
+	__goTo(bp, RIGHT);
+}
 
 void goBack(BinaryPath *bp) {
 	assert(bp->length > 0);
@@ -50,8 +54,8 @@ int getBPStep(const BinaryPath *bp, size_t index) {
 void printBinaryPath(const BinaryPath *bp) {
 	for (size_t i = 0;
 
-		i < bp->length
-		//  i < (bp->length / 8 + (bp->length % 8 != 0)) * 8
+		 i < bp->length
+		 //  i < (bp->length / 8 + (bp->length % 8 != 0)) * 8
 
 		 ;
 		 i++) {
@@ -59,5 +63,4 @@ void printBinaryPath(const BinaryPath *bp) {
 		if ((i + 1) % 8 == 0)
 			printf(" ");
 	}
-	printf("\n");
 }

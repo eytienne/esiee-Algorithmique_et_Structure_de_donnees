@@ -17,26 +17,32 @@ int main(int argc, char const *argv[]) {
 
 	BinaryPath *bp = newBinaryPath();
 	printBinaryPath(bp);
+	printf("\n");
 
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 2; j++) {
 			goToLeft(bp);
 			printBinaryPath(bp);
+			printf("\n");
 		}
 		goToRight(bp);
 		printBinaryPath(bp);
+		printf("\n");
 
 		goToLeft(bp);
 		printBinaryPath(bp);
+		printf("\n");
 		for (int j = 0; j < 4; j++) {
 			goToRight(bp);
 			printBinaryPath(bp);
+			printf("\n");
 		}
 	}
 
 	for (int i = 0; i < 16; i++) {
 		goBack(bp);
 		printBinaryPath(bp);
+		printf("\n");
 	}
 
 	return 0;

@@ -44,8 +44,9 @@ int __walkWithPath(const TreeNode *tn, void *buffer) {
 
 	while (!isSSEmpty(wwpi->parents) && !isParent(tn, last)) {
 		unsstack(wwpi->parents);
-		goBack(wwpi->bp);
 		last = !isSSEmpty(wwpi->parents) ? top(wwpi->parents) : NULL;
+		if (last)
+			goBack(wwpi->bp);
 	}
 
 	if (last != NULL) {
