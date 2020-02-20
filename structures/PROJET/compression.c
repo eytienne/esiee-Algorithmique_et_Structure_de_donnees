@@ -53,7 +53,7 @@ int printLeavesWithBPaths(const TreeNode *t, void *buffer,
 }
 
 void printPQTN(const PriorityQueue *pq) {
-	LLCell *cur = pq->first;
+	LLCell *cur = pq->parent->first;
 	while (cur != NULL) {
 		const PQCell *curPQC = (const PQCell *)cur->value;
 		const TreeNode *curTN = (const TreeNode *)curPQC->value;
@@ -66,15 +66,15 @@ void printPQTN(const PriorityQueue *pq) {
 
 void printPQ(const PriorityQueue *pq) {
 	printf("~~~~~~~~~~~~~~~~~\n");
-	LLCell *cur = pq->first;
+	LLCell *cur = pq->parent->first;
 	while (cur != NULL) {
 		const PQCell *curPQC = (const PQCell *)cur->value;
 		const TreeNode *curTN = (const TreeNode *)curPQC->value;
 		const HuffmanPair *curHP = (const HuffmanPair *)curTN->value;
 		printHuffmanPair(curHP);
-		if (cur == pq->first)
+		if (cur == pq->parent->first)
 			printf(" <-- first ");
-		if (cur == pq->last)
+		if (cur == pq->parent->last)
 			printf(" <-- last ");
 		printf("\n");
 		cur = cur->next;
@@ -145,10 +145,10 @@ void compress(FILE *src, char *filename) {
 	printPQ(pq);
 
 	TreeNode *huffmanHeap = NULL;
-	while (!isLLEmpty(pq)) {
+	while (!isPQEmpty(pq)) {
 		printf("________________________________________\n");
 		huffmanHeap = shiftFromPriorityQueue(pq);
-		if (!isLLEmpty(pq)) {
+		if (!isPQEmpty(pq)) {
 			TreeNode *toMergeWith = shiftFromPriorityQueue(pq);
 			const HuffmanPair *hpOne = (const HuffmanPair *)huffmanHeap->value;
 			const HuffmanPair *hpTwo = (const HuffmanPair *)toMergeWith->value;
@@ -158,14 +158,6 @@ void compress(FILE *src, char *filename) {
 			TreeNode *merged = newTreeNode(&nonLeaf, sizeof(HuffmanPair),
 										   huffmanHeap, toMergeWith);
 
-			assert(huffmanHeap && toMergeWith);
-			assert(merged->left == huffmanHeap);
-			assert(merged->right == toMergeWith);
-
-			walkWithPath(huffmanHeap, PREFIXE, prefixPrint, printHuffmanPair);
-			printf("_________\n");
-			walkWithPath(toMergeWith, PREFIXE, prefixPrint, printHuffmanPair);
-			printf("____________________\n");
 			walkWithPath(merged, PREFIXE, prefixPrint, printHuffmanPair);
 
 			walkWithPath(huffmanHeap, PREFIXE, printLeavesWithBPaths,
