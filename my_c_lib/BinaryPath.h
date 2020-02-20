@@ -9,10 +9,15 @@ typedef struct BinaryPath {
 } BinaryPath;
 
 BinaryPath *newBinaryPath();
+
+BinaryPath *bpcpy(BinaryPath *dest, const BinaryPath *src);
+
 void goToLeft(BinaryPath *bp);
 void goToRight(BinaryPath *bp);
 void goBack(BinaryPath *bp);
+
 int getBPStep(const BinaryPath *bp, size_t index);
+
 void printBinaryPath(const BinaryPath *bp);
 
 #endif
