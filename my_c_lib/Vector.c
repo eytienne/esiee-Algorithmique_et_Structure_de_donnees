@@ -7,33 +7,39 @@
 // private method
 int changeCapactity(Vector *v, size_t newCapacity);
 
-void create_expert(Vector *v, int capacity, int increment, size_t sizeofEach) {
-	assert(v != NULL);
+Vector *newVectorExpert(int capacity, int increment, size_t sizeofEach) {
+	Vector *v = malloc(sizeof(Vector));
 	v->capacity = capacity;
 	v->sizeofEach = sizeofEach;
-	v->values = malloc(v->capacity * v->sizeofEach);
+	v->values = malloc(v->capacity * sizeof(void *));
 	v->size = 0;
 	v->increment = increment;
+	return v;
 }
 
-void create(Vector *v, size_t sizeofEach) {
-	create_expert(v, 10, 3, sizeofEach);
+Vector *newVector(size_t sizeofEach) {
+	return newVectorExpert(10, 3, sizeofEach);
 }
 
-void destroy(Vector *v) {
+void freeVector(Vector *v, void (*freeValue)(void *)) {
 	assert(v != NULL);
-	for (int i = 0; i < v->size; i++) {
-		free(&v->values[i]);
-	}
+	if (freeValue != NULL)
+		for (int i = 0; i < v->size; i++)
+			freeValue(&v->values[i]);
 	free(v->values);
 	v->values = NULL;
 	v->capacity = 0;
 	v->size = 0;
+	free(v);
 }
 
-int size(const Vector *v) { return v->size; }
+int size(const Vector *v) {
+	return v->size;
+}
 
-int capacity(const Vector *v) { return v->capacity; }
+int capacity(const Vector *v) {
+	return v->capacity;
+}
 
 void *get(const Vector *v, int index) {
 	assert(index >= 0 && index < v->size);

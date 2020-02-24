@@ -12,11 +12,11 @@ struct Vector {
 };
 typedef struct Vector Vector;
 
-void create_expert(Vector *v, int capacity, int increment, size_t sizeofEach);
+Vector *newVectorExpert(int capacity, int increment, size_t sizeofEach);
 
-void create(Vector *v, size_t sizeofEach);
+Vector *newVector(size_t sizeofEach);
 
-void destroy(Vector *v);
+void freeVector(Vector *v, void (*freeValue)(void *element));
 
 int size(const Vector *v);
 

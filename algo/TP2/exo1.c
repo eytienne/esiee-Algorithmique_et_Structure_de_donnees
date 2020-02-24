@@ -29,8 +29,7 @@ void display(const Vector *v) {
 int main(int argc, char const *argv[]) {
 
 	srand(time(NULL));
-	Vector *v;
-	create_expert(v, 10, 1, sizeof(int));
+	Vector *v = newVectorExpert(10, 1, sizeof(int));
 	for (int i = 0; i < 10; i++) {
 		int r = rand();
 		add(v, &r);

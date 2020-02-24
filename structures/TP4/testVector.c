@@ -13,25 +13,25 @@ int demo();
 void printVector(Vector *v);
 void printVectorWithChars(Vector *v);
 
-int main(int argc, char const *argv[]) { return test(); }
+int main(int argc, char const *argv[]) {
+	return test();
+}
 
 int test() {
-	Vector *v = (Vector *)malloc(sizeof(Vector));
-
-	create(v, sizeof(int *));
+	Vector *v = newVector(sizeof(int));
 	printVector(v);
 	assert(v->values != NULL);
 	assert(capacity(v) == 10);
 	assert(size(v) == 0);
 	assert(v->increment == 3);
 
-	destroy(v);
+	freeVector(v, NULL);
 	printVector(v);
 	assert(v->values == NULL);
 	assert(capacity(v) == 0);
 	assert(size(v) == 0);
 
-	create_expert(v, 5, 4, sizeof(int *));
+	v = newVectorExpert(5, 4, sizeof(int));
 	printVector(v);
 	assert(v->values != NULL);
 	assert(capacity(v) == 5);
@@ -84,7 +84,7 @@ int test() {
 	getRef = (int *)get(v, 0);
 	assert(*getRef == 10);
 
-	free(v);
+	freeVector(v, NULL);
 	v = NULL;
 
 	printf("\n" GREEN_BG CUSTOM_FG "All the tests passed !" COLOR_RESET "\n");
@@ -92,8 +92,7 @@ int test() {
 }
 
 int demo() {
-	Vector *v = (Vector *)malloc(sizeof(Vector));
-	create(v, sizeof(char *));
+	Vector *v = newVector(sizeof(char *));
 
 	char *cc = "c";
 	add(v, cc);

@@ -40,8 +40,7 @@ int intcmp2(const void *a, const void *b) {
 }
 
 int main(int argc, char const *argv[]) {
-	Vector *v = malloc(sizeof(Vector));
-	create(v, sizeof(int));
+	Vector *v = newVector(sizeof(int));
 	int value = 10;
 	add(v, &value);
 	value = -3;

@@ -21,13 +21,17 @@ int isLeaf(const TreeNode *t);
 
 int isParent(const TreeNode *from, const TreeNode *it);
 
-int walkWithPath(const TreeNode *root, enum PATHWAY p,
+int walkExpert(const TreeNode *root, enum PATHWAY p,
 				 int (*function)(const TreeNode *, void *buffer,
 								 const BinaryPath *bp),
 				 void *buffer);
 
 int walk(const TreeNode *t, enum PATHWAY p,
 		 int (*function)(const TreeNode *, void *buffer), void *buffer);
+
+
+int transform(TreeNode* root, enum PATHWAY p,
+		 int (*function)(TreeNode *, void *buffer), void *buffer);
 
 int countTreeNodeNodes(const TreeNode *t, void *counter);
 
