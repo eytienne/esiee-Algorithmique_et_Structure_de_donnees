@@ -61,7 +61,8 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 		const TreeNode *cur = unsstack(toVisit);
 		if (cur == NULL)
 			continue;
-		while (!isSSEmpty(parents) && !isParent(cur, top(parents))) {
+		while (!isSSEmpty(parents) &&
+			   !isParent(cur, (const TreeNode *)top(parents))) {
 			unsstack(parents);
 			if (!isSSEmpty(parents))
 				goBack(bp);
@@ -127,7 +128,7 @@ typedef struct __walkApplyInfo {
 
 int __walkApply(const TreeNode *tn, void *buffer, const BinaryPath *bp) {
 	__walkApplyInfo *wai = buffer;
-	wai->function(tn, wai->buffer);
+	return wai->function(tn, wai->buffer);
 }
 
 int walk(const TreeNode *root, enum PATHWAY p,
@@ -140,13 +141,13 @@ int transformExpert(TreeNode *root, enum PATHWAY p,
 					int (*function)(TreeNode *, void *buffer,
 									const BinaryPath *bp),
 					void *buffer) {
-	walk(root, p, (int (*)(const TreeNode *, void *))function, buffer);
+	return walk(root, p, (int (*)(const TreeNode *, void *))function, buffer);
 }
 
 int transform(TreeNode *root, enum PATHWAY p,
 			  int (*function)(TreeNode *, void *buffer), void *buffer) {
 	__walkApplyInfo wai = {(int (*)(const TreeNode *, void *))function, buffer};
-	transformExpert(
+	return transformExpert(
 		root, p, (int (*)(TreeNode *, void *, const BinaryPath *))__walkApply,
 		&wai);
 }

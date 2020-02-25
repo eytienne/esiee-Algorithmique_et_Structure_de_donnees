@@ -8,6 +8,7 @@ compileProject:
 		my_c_lib/Queue.c \
 		my_c_lib/PriorityQueue.c \
 		my_c_lib/ShallowStack.c \
+		my_c_lib/StackTrace.c \
 		my_c_lib/TreeNode.c \
 		my_c_lib/Vector.c \
 		structures/PROJET/compression.c \
@@ -30,6 +31,7 @@ testTree:
 	gcc -g -rdynamic \
 		my_c_lib/BinaryPath.c \
 		my_c_lib/ShallowStack.c \
+		my_c_lib/StackTrace.c \
 		my_c_lib/*Tree*.c \
 		my_c_lib/Vector.c \
 		structures/TP5/testTree2.c \

@@ -1,15 +1,26 @@
+#include "../../my_c_lib/StackTrace.h"
 #include "compression.h"
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
+	signal(SIGSEGV, printStackTrace);
+	signal(SIGABRT, printStackTrace);
+
 	FILE *src = NULL;
 	if (argc != 2) {
 		fputs("Give the file to test compression with as argument!\n", stderr);
 		exit(EXIT_FAILURE);
 	}
-	src = fopen(argv[1], "r");
-	compress(src, "compressed.bin");
+	char *filename = argv[1];
+	src = fopen(filename, "r");
+	size_t len = strlen(filename);
+	char *output = malloc(len + 4);
+	strcpy(output, filename);
+	strcat(output, ".bin");
+	compress(src, output);
 	fclose(src);
 	return 0;
 }

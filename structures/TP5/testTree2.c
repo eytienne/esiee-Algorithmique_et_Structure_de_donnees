@@ -1,13 +1,12 @@
 
 #include "../../my_c_lib/BSTree.h"
 #include "../../my_c_lib/BinaryPath.h"
+#include "../../my_c_lib/StackTrace.h"
 #include "../../my_c_lib/Vector.h"
 #include <assert.h>
-#include <execinfo.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 int intcmp(const void *c1, const void *c2) {
 	return *(int *)c1 - *(int *)c2;
@@ -36,22 +35,9 @@ Vector *pickLeaves(TreeNode *root) {
 	return leaves;
 }
 
-void handler(int sig) {
-	void *array[10];
-	size_t size;
-
-	// get void*'s for all entries on the stack
-	size = backtrace(array, 10);
-
-	// print out all the frames to stderr
-	fprintf(stderr, "Error: signal %d:\n", sig);
-	backtrace_symbols_fd(array, size, STDERR_FILENO);
-	exit(1);
-}
-
 int main(int argc, char const *argv[]) {
-	signal(SIGSEGV, handler);
-	signal(SIGABRT, handler);
+	signal(SIGSEGV, printStackTrace);
+	signal(SIGABRT, printStackTrace);
 
 	BSTree *t = newTree(sizeof(int), intcmp);
 	assert(t != NULL);

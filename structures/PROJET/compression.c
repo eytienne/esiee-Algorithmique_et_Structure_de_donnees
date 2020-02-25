@@ -60,22 +60,24 @@ int __printLeavesWithBPaths(const TreeNode *t, void *buffer,
 int __pickLeaves(const TreeNode *t, void *buffer, const BinaryPath *bp) {
 	assert(buffer != NULL);
 	Vector *leaves = buffer;
-	// if (isLeaf(t)) {
-		HuffmanCode *newCode = malloc(sizeof(HuffmanCode));
+	if (isLeaf(t)) {
 		const HuffmanPair *value = t->value;
+
+		HuffmanCode *newCode = malloc(sizeof(HuffmanCode));
 		newCode->c = value->c;
-		printf("'%c' -> ", newCode->c);
 		newCode->code = malloc(sizeof(BinaryPath));
 		bpcpy(newCode->code, bp);
-		printBinaryPath(bp);
+
+		printf("'%c' -> ", newCode->c);
+		printBinaryPath(newCode->code);
 		printf("\n");
 		add(leaves, newCode);
-	// }
+	}
 	return WALK_SUCCESS;
 }
 
-Vector *pickLeaves(TreeNode *root) {
-	Vector *leaves = newVectorExpert(sizeof(HuffmanCode));
+Vector *pickLeaves(const TreeNode *root) {
+	Vector *leaves = newVector(sizeof(HuffmanCode));
 	walkExpert(root, PREFIXE, __pickLeaves, leaves);
 	return leaves;
 }
@@ -84,17 +86,18 @@ int ucharcmp(const void *a, const void *b) {
 	return *(unsigned char *)a - *(unsigned char *)b;
 }
 
-int printLeavesWithBPaths(const TreeNode *root) {
-
+void printLeavesWithBPaths(const TreeNode *root) {
 	// walkExpert(root, PREFIXE, __printLeavesWithBPaths, printHuffmanPairChar);
 	Vector *leaves = pickLeaves(root);
-	// qsort(leaves, size(leaves), leaves->sizeofEach, ucharcmp);
-	// printf("coucou\n");
-	// for (size_t i = 0; i < size(leaves); i++) {
-	// 	const HuffmanCode *cur = leaves->values[i];
-	// 	printf("%c -> ", cur->c);
-	// 	printBinaryPath(cur->code);
-	// }
+	qsort(leaves, size(leaves), leaves->sizeofEach, ucharcmp);
+	for (size_t i = 0; i < size(leaves); i++) {
+		printf("start loop\n");
+		const HuffmanCode *cur = leaves->values[i];
+		printf("%c -> ", cur->c);
+		printBinaryPath(cur->code);
+		printf("end loop\n");
+	}
+	printf("end print\n");
 }
 
 void printPQTN(const PriorityQueue *pq) {
@@ -154,7 +157,6 @@ void compress(FILE *src, char *filename) {
 			if (buffer[i] == '\0')
 				break;
 			printf("%c", buffer[i]);
-			// printf("%d '%c'\n", i, buffer[i]);
 			counters[buffer[i]]++;
 			if (buffer[i] == '\n')
 				break;
