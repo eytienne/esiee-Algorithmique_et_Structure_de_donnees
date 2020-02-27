@@ -25,7 +25,7 @@ void freeVector(Vector *v, void (*freeValue)(void *)) {
 	assert(v != NULL);
 	if (freeValue != NULL)
 		for (int i = 0; i < v->size; i++)
-			freeValue(&v->values[i]);
+			freeValue(v->values[i]);
 	free(v->values);
 	v->values = NULL;
 	v->capacity = 0;
@@ -125,7 +125,7 @@ int adjust(Vector *v) {
 }
 
 int changeCapactity(Vector *v, size_t newCapacity) {
-	void **newValues = realloc(v->values, newCapacity * v->sizeofEach);
+	void **newValues = realloc(v->values, newCapacity * sizeof(void *));
 	if (newValues == NULL)
 		return EXIT_FAILURE;
 	v->values = newValues;
