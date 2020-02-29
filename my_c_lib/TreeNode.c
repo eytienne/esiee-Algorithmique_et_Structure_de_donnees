@@ -23,73 +23,14 @@ int isLeaf(const TreeNode *t) {
 	return t->left == NULL && t->right == NULL;
 }
 
-int isParent(const TreeNode *from, const TreeNode *it) {
-	return from == it->left || from == it->right;
+int isParent(const TreeNode *son, const TreeNode *it) {
+	assert(it);
+	return son == it->left || son == it->right;
 }
-
-typedef struct WalkWithPathInfo {
-	BinaryPath *bp;
-	ShallowStack *parents;
-	int (*function)(const TreeNode *, void *buffer, const BinaryPath *bp);
-	void *buffer;
-} WalkWithPathInfo;
-
-int __walkWithPath(const TreeNode *tn, void *buffer) {
-
-	assert(buffer != NULL);
-	WalkWithPathInfo *wwpi = (WalkWithPathInfo *)buffer;
-
-	const TreeNode *last =
-		!isSSEmpty(wwpi->parents) ? top(wwpi->parents) : NULL;
-
-	while (!isSSEmpty(wwpi->parents) && !isParent(tn, last)) {
-		unsstack(wwpi->parents);
-		last = !isSSEmpty(wwpi->parents) ? top(wwpi->parents) : NULL;
-		if (last)
-			goBack(wwpi->bp);
-	}
-
-	if (last != NULL) {
-		if (last->left == tn) {
-			goToLeft(wwpi->bp);
-		} else if (last->right == tn) {
-			goToRight(wwpi->bp);
-		}
-	}
-
-	if (wwpi->function(tn, wwpi->buffer, wwpi->bp))
-		return WALK_FAILURE;
-
-	sstack(wwpi->parents, tn);
-
-	return WALK_SUCCESS;
-}
-
-int walkWithPath(const TreeNode *root, enum PATHWAY p,
-				 int (*function)(const TreeNode *, void *buffer,
-								 const BinaryPath *bp),
-				 void *buffer) {
-	BinaryPath *bp = newBinaryPath();
-	WalkWithPathInfo wwpi = {bp, newShallowStack(), function, buffer};
-	return walk(root, p, __walkWithPath, &wwpi);
-}
-
-// int prefixWalk_rec(const TreeNode *tn,
-// 					int (*function)(const TreeNode *, void *buffer),
-// 					void *buffer) {
-// 	if (tn == NULL)
-// 		return WALK_SUCCESS;
-// 	if (function(tn, buffer))
-// 		return WALK_FAILURE;
-// 	if (prefixWalk_rec(tn->left, function, buffer))
-// 		return WALK_FAILURE;
-// 	if (prefixWalk_rec(tn->right, function, buffer))
-// 		return WALK_FAILURE;
-// 	return WALK_SUCCESS;
-// }
 
 int postfixWalk_rec(const TreeNode *tn,
-					int (*function)(const TreeNode *, void *buffer),
+					int (*function)(const TreeNode *, void *buffer,
+									const BinaryPath *bp),
 					void *buffer) {
 	if (tn == NULL)
 		return WALK_SUCCESS;
@@ -97,37 +38,54 @@ int postfixWalk_rec(const TreeNode *tn,
 		return WALK_FAILURE;
 	if (postfixWalk_rec(tn->right, function, buffer))
 		return WALK_FAILURE;
-	if (function(tn, buffer))
+	if (function(tn, buffer, NULL))
 		return WALK_FAILURE;
 	return WALK_SUCCESS;
 }
 
-int walk(const TreeNode *root, enum PATHWAY p,
-		 int (*function)(const TreeNode *, void *buffer), void *buffer) {
+int walkExpert(const TreeNode *root, enum PATHWAY p,
+			   int (*function)(const TreeNode *, void *buffer,
+							   const BinaryPath *bp),
+			   void *buffer) {
+	int walkResult = WALK_SUCCESS;
+	BinaryPath *bp = newBinaryPath();
+	ShallowStack *parents = newShallowStack();
+	sstack(parents, root);
 
 	ShallowStack *toVisit = newShallowStack();
 	sstack(toVisit, root);
-	ShallowStack *toProcess = newShallowStack();
-	ShallowStack *toProcessOnRight = newShallowStack();
 
-	while (!isSSEmpty(toVisit)) {
+	ShallowStack *toProcess = newShallowStack();
+	ShallowStack *TPR = newShallowStack();
+
+	while (!isSSEmpty(toVisit) && walkResult == WALK_SUCCESS) {
 		const TreeNode *cur = unsstack(toVisit);
 		if (cur == NULL)
 			continue;
+		while (!isSSEmpty(parents) &&
+			   !isParent(cur, (const TreeNode *)top(parents))) {
+			unsstack(parents);
+			if (!isSSEmpty(parents))
+				goBack(bp);
+		}
+		if (!isSSEmpty(parents)) {
+			const TreeNode *father = top(parents);
+			if (father->left == cur) {
+				goToLeft(bp);
+			} else if (father->right == cur) {
+				goToRight(bp);
+			}
+		}
 		switch (p) {
 		case PREFIXE:
-			if (function(cur, buffer))
-				return WALK_FAILURE;
+			walkResult = function(cur, buffer, bp);
 			sstack(toVisit, cur->right);
 			sstack(toVisit, cur->left);
-			// return prefixWalk_rec(cur, function, buffer);
 			break;
 		case INFIXE:
 			// left angle
 			if (cur->left == NULL) {
-				if (function(cur, buffer))
-					return WALK_FAILURE;
-
+				walkResult = function(cur, buffer, bp);
 				if (cur->right != NULL) {
 					sstack(toVisit, cur->right);
 				} else {
@@ -135,8 +93,7 @@ int walk(const TreeNode *root, enum PATHWAY p,
 					// loop to come back while not finding right to visit
 					while (previousRight == NULL && !isSSEmpty(toProcess)) {
 						const TreeNode *previous = unsstack(toProcess);
-						if (function(previous, buffer))
-							return WALK_FAILURE;
+						walkResult = function(previous, buffer, bp);
 						if (previous->right != NULL)
 							previousRight = previous->right;
 					}
@@ -148,39 +105,49 @@ int walk(const TreeNode *root, enum PATHWAY p,
 			}
 			break;
 		case POSTFIXE:
-			// left angle
-			// if (isLeaf(cur)) {
-			// 	if (function(cur, buffer))
-			// 		return WALK_FAILURE;
-
-			// 	if (cur->right != NULL) {
-			// 		sstack(toVisit, cur->right);
-			// 	} else {
-			// 		if (!isSSEmpty(toProcess)) {
-			// 			const TreeNode *previous = top(toProcess);
-			// 			// loop to come back while not finding right to visit
-			// 			while (previous == NULL && !isSSEmpty(toProcess)) {
-			// 				const TreeNode *previous = unsstack(toProcess);
-			// 				if (function(previous, buffer))
-			// 					return WALK_FAILURE;
-			// 				if (previous->right != NULL)
-			// 					previousRight = previous->right;
-			// 			}
-			// 			sstack(toVisit, previousRight);
-			// 		}
-			// 	}
-			// } else {
-			// 	sstack(toProcess, cur);
-			// 	sstack(toVisit, cur->right);
-			// 	sstack(toVisit, cur->left);
-			// }
-			return postfixWalk_rec(cur, function, buffer);
-			// break;
+			walkResult = postfixWalk_rec(cur, function, buffer);
+			break;
 		default:
-			return WALK_FAILURE;
+			walkResult = WALK_FAILURE;
 		}
+		sstack(parents, cur);
 	}
-	return WALK_SUCCESS;
+	freeShallowStack(toVisit);
+	freeShallowStack(toProcess);
+	freeShallowStack(TPR);
+	freeBinaryPath(bp);
+	return walkResult;
+}
+
+typedef struct __walkApplyInfo {
+	int (*function)(const TreeNode *, void *buffer);
+	void *buffer;
+} __walkApplyInfo;
+
+int __walkApply(const TreeNode *tn, void *buffer, const BinaryPath *bp) {
+	__walkApplyInfo *wai = buffer;
+	return wai->function(tn, wai->buffer);
+}
+
+int walk(const TreeNode *root, enum PATHWAY p,
+		 int (*function)(const TreeNode *, void *buffer), void *buffer) {
+	__walkApplyInfo wai = {function, buffer};
+	return walkExpert(root, p, __walkApply, &wai);
+}
+
+int transformExpert(TreeNode *root, enum PATHWAY p,
+					int (*function)(TreeNode *, void *buffer,
+									const BinaryPath *bp),
+					void *buffer) {
+	return walk(root, p, (int (*)(const TreeNode *, void *))function, buffer);
+}
+
+int transform(TreeNode *root, enum PATHWAY p,
+			  int (*function)(TreeNode *, void *buffer), void *buffer) {
+	__walkApplyInfo wai = {(int (*)(const TreeNode *, void *))function, buffer};
+	return transformExpert(
+		root, p, (int (*)(TreeNode *, void *, const BinaryPath *))__walkApply,
+		&wai);
 }
 
 int countTreeNodeNodes(const TreeNode *t, void *counter) {

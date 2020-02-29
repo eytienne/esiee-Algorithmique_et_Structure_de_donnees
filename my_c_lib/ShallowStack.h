@@ -14,14 +14,14 @@ typedef struct ShallowStack {
 
 ShallowStack *newShallowStack();
 
-void freeShallowStack(ShallowStack *p);
+void freeShallowStack(ShallowStack *ss);
 
-const void *top(ShallowStack *p);
+const void *top(ShallowStack *ss);
 
-const void *unsstack(ShallowStack *p);
+const void *unsstack(ShallowStack *ss);
 
-void sstack(ShallowStack *p, const void *v);
+void sstack(ShallowStack *ss, const void *v);
 
-int isSSEmpty(const ShallowStack *p);
+int isSSEmpty(const ShallowStack *ss);
 
 #endif

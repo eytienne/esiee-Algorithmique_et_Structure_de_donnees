@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 enum DIRECTION { LEFT, RIGHT };
 
@@ -10,6 +11,20 @@ BinaryPath *newBinaryPath() {
 	newOne->bits = NULL;
 	newOne->length = 0;
 	return newOne;
+}
+
+void freeBinaryPath(BinaryPath *bp) {
+	free(bp->bits);
+	bp->length = -1;
+	free(bp);
+}
+
+BinaryPath *bpcpy(BinaryPath *dest, const BinaryPath *src) {
+	size_t toCopy = src->length / 8 + (src->length % 8 != 0);
+	assert(dest->bits = malloc(toCopy));
+	memcpy(dest->bits, src->bits, toCopy);
+	dest->length = src->length;
+	return dest;
 }
 
 void __goTo(BinaryPath *bp, enum DIRECTION d) {

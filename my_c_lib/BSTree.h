@@ -29,17 +29,6 @@ void insertIntoTree(BSTree *t, const void *newValue);
 
 const TreeNode *findTreeNode(BSTree *t, const void *value);
 
-int walkTreeWithPath(const BSTree *t, enum PATHWAY p,
-					 int (*function)(const TreeNode *, void *buffer,
-									 const BinaryPath *bp),
-					 void *buffer);
-
-int walkTree(const BSTree *t, enum PATHWAY p,
-			 int (*function)(const TreeNode *, void *buffer), void *buffer);
-
-int transformTree(BSTree *t, enum PATHWAY p,
-				  int (*function)(TreeNode *, void *buffer), void *buffer);
-
 int isOrdered(const BSTree *t);
 
 void **treeSort(void **src, int n, size_t size,

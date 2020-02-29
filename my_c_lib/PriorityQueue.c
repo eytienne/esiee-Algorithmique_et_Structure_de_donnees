@@ -18,7 +18,10 @@ PQCell *newPQCell(const void *e, size_t size, int priority) {
 }
 
 PriorityQueue *newPriorityQueue(size_t sizeofEach) {
-	return newLinkedList(sizeof(PQCell));
+	PriorityQueue *newOne = malloc(sizeof(PriorityQueue));
+	newOne->parent = newLinkedList(sizeof(PQCell));
+	newOne->sizeofEach = sizeofEach;
+	return newOne;
 }
 
 void freePQCell(void *value, void *buffer) {
@@ -29,36 +32,43 @@ void freePQCell(void *value, void *buffer) {
 }
 
 void freePriorityQueue(PriorityQueue *pq, void (*freeValue)(void *value)) {
-	freeLinkedListWithBuffer(pq, freePQCell, freeValue);
+	freeLinkedListWithBuffer(pq->parent, freePQCell, freeValue);
+	pq->parent = NULL;
+	pq->sizeofEach = -1;
+	free(pq);
+}
+
+int isPQEmpty(const PriorityQueue *pq){
+	return isLLEmpty(pq->parent);
 }
 
 void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 	LLCell *newOne = malloc(sizeof(LLCell));
 	newOne->value = newPQCell(e, pq->sizeofEach, priority);
 
-	if (pq->first == NULL) {
+	if (pq->parent->first == NULL) {
 		newOne->previous = NULL;
 		newOne->next = NULL;
-		pq->first = pq->last = newOne;
+		pq->parent->first = pq->parent->last = newOne;
 		// printf("first first!\n");
 		return;
 	}
-	LLCell *cur = pq->first;
+	LLCell *cur = pq->parent->first;
 	// tant que le nouveau est supérieur ou égal alors on passe
 	while (cur != NULL && pq_cell_cmp((const PQCell *)newOne->value,
 									  (const PQCell *)cur->value) >= 0) {
 		cur = cur->next;
 	}
-	if (cur == pq->first) { // insert as new first
-		newOne->next = pq->first;
-		pq->first->previous = newOne;
-		pq->first = newOne;
+	if (cur == pq->parent->first) { // insert as new first
+		newOne->next = pq->parent->first;
+		pq->parent->first->previous = newOne;
+		pq->parent->first = newOne;
 		// printf("new first!\n");
 	} else if (cur == NULL) { // insert as new last
-		newOne->previous = pq->last;
+		newOne->previous = pq->parent->last;
 		newOne->next = NULL;
-		pq->last->next = newOne;
-		pq->last = newOne;
+		pq->parent->last->next = newOne;
+		pq->parent->last = newOne;
 		// printf("last!\n");
 	} else { // insert in the middle
 		newOne->previous = cur->previous;
@@ -70,7 +80,7 @@ void addToPriorityQueue(PriorityQueue *pq, const void *e, int priority) {
 }
 
 void *shiftFromPriorityQueue(PriorityQueue *pq) {
-	PQCell *toFree = shift(pq);
+	PQCell *toFree = shift(pq->parent);
 	void *ret = toFree->value;
 	free(toFree);
 	return ret;
