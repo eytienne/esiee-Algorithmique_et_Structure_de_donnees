@@ -17,6 +17,8 @@ enum WALK_CHECK { WALK_SUCCESS, WALK_FAILURE };
 TreeNode *newTreeNode(const void *value, size_t size, TreeNode *left,
 					  TreeNode *right);
 
+void freeTreeNode(TreeNode *tn, void (*freeValue)(void *value));
+
 int isLeaf(const TreeNode *t);
 
 int isParent(const TreeNode *from, const TreeNode *it);

@@ -18,6 +18,20 @@ TreeNode *newTreeNode(const void *value, size_t size, TreeNode *left,
 	return newOne;
 }
 
+int __freeTree(TreeNode *tn, void *buffer) {
+	void (*freeValue)(void *value) = (void (*)(void *))buffer;
+	if (freeValue != NULL)
+		freeValue(tn->value);
+	else
+		free(tn->value);
+	free(tn);
+	return WALK_SUCCESS;
+}
+
+void freeTreeNode(TreeNode *tn, void (*freeValue)(void *value)) {
+	transform(tn, POSTFIXE, __freeTree, freeValue);
+}
+
 int isLeaf(const TreeNode *t) {
 	assert(t != NULL);
 	return t->left == NULL && t->right == NULL;

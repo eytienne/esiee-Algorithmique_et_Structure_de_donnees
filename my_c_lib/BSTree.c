@@ -34,20 +34,9 @@ BSTree *newTree(size_t sizeofEach,
 	return newOne;
 }
 
-int __freeTree(TreeNode *t, void *buffer) {
-	void (*freeValue)(void *value) = (void (*)(void *))buffer;
-	if (freeValue != NULL)
-		freeValue(t->value);
-	else
-		free(t->value);
-	free(t);
-	return WALK_SUCCESS;
-}
-
 void freeTree(BSTree *t, void (*freeValue)(void *value)) {
 	assert(t != NULL);
-	transform(t->root, POSTFIXE, __freeTree, freeValue);
-	t->root = NULL;
+	freeTreeNode(t->root, freeValue);
 	t->sizeofEach = -1;
 	t->nodecmp = NULL;
 }
