@@ -10,7 +10,7 @@ compileProject:
 		my_c_lib/ShallowStack.c \
 		my_c_lib/TreeNode.c \
 		my_c_lib/Vector.c \
-		structures/PROJET/compression.c \
+		structures/PROJET/hzip.c \
 		structures/PROJET/main.c \
 		-o main
 
@@ -23,7 +23,7 @@ checkProject:
 		my_c_lib/ShallowStack.c \
 		my_c_lib/TreeNode.c \
 		my_c_lib/Vector.c \
-		structures/PROJET/compression.c \
+		structures/PROJET/hzip.c \
 		structures/PROJET/main.c \
 
 testTree:

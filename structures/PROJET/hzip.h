@@ -1,5 +1,5 @@
-#ifndef COMPRESSION_H
-#define COMPRESSION_H
+#ifndef HZIP_H
+#define HZIP_H
 
 #include "../../my_c_lib/TreeNode.h"
 #include <stdio.h>

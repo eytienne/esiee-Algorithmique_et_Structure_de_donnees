@@ -1,4 +1,4 @@
-#include "compression.h"
+#include "hzip.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +7,7 @@
 int main(int argc, char *argv[]) {
 	FILE *src = NULL;
 	if (argc < 2) {
-		fputs("Give the file to test compression with as argument!\n", stderr);
+		fputs("Give the file to test hzip with as argument!\n", stderr);
 		exit(EXIT_FAILURE);
 	}
 	char *filename = argv[1];

@@ -1,4 +1,4 @@
-#include "compression.h"
+#include "hzip.h"
 #include "../../my_c_lib/PriorityQueue.h"
 #include "../../my_c_lib/TreeNode.h"
 #include "../../my_c_lib/Vector.h"
