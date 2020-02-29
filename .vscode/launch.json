@@ -26,6 +26,7 @@
                 }
             ],
             "preLaunchTask": "compile my project"
+            // "preLaunchTask": "compile test"
         }
     ]
 }

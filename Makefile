@@ -35,7 +35,6 @@ testTree:
 		my_c_lib/Vector.c \
 		structures/TP5/testTree2.c \
 		-o main \
-	&& ./main
 
 testBinaryPath:
 	gcc \
@@ -44,18 +43,15 @@ testBinaryPath:
 		my_c_lib/*Tree*.c \
 		structures/PROJET/testBinaryPath.c \
 		-o main \
-	&& ./main
 
 testShallowStack:
 	gcc \
 		my_c_lib/ShallowStack.c \
 		structures/PROJET/testShallowStack.c \
 		-o main \
-	&& ./main
 
 testVector:
-	gcc \
+	gcc -g \
 		my_c_lib/Vector.c \
 		structures/TP4/testVector.c \
 		-o main \
-	&& ./main

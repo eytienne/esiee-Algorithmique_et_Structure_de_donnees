@@ -15,6 +15,7 @@ void printVectorWithChars(Vector *v);
 
 int main(int argc, char const *argv[]) {
 	return test();
+	// return demo();
 }
 
 int test() {
@@ -26,10 +27,7 @@ int test() {
 	assert(v->increment == 3);
 
 	freeVector(v, NULL);
-	printVector(v);
-	assert(v->values == NULL);
-	assert(capacity(v) == 0);
-	assert(size(v) == 0);
+	v = NULL;
 
 	v = newVectorExpert(5, 4, sizeof(int));
 	printVector(v);
@@ -99,7 +97,7 @@ int demo() {
 	printVectorWithChars(v);
 
 	char *cc2 = "wesh";
-	set(v, 1, cc2);
+	add(v, cc2);
 	printVectorWithChars(v);
 
 	free(v);
@@ -109,17 +107,15 @@ int demo() {
 }
 
 void printVector(Vector *v) {
-	printf("Vector (size : %d, capacity : %d): \n", v->size, v->capacity);
-	for (int i = 0; i < size(v); i++) {
-		int *cc = get(v, i);
-		printf("ptr: %p\n", cc);
-		assert(cc != NULL);
-		printf("%d\n", *cc);
-	}
+	printf("Vector (size : %d, capacity : %d): \n", size(v), capacity(v));
+	int *cur = NULL;
+	while (forEach(v, (const void **)&cur))
+		printf("%d\n", *cur);
 }
 
 void printVectorWithChars(Vector *v) {
-	printf("Vector (size : %d, capacity : %d): \n", v->size, v->capacity);
-	for (int i = 0; i < size(v); i++)
-		printf("%s\n", (char *)get(v, i));
+	printf("Vector (size : %d, capacity : %d): \n", size(v), capacity(v));
+	char *cur = NULL;
+	while (forEach(v, (const void **)&cur))
+		printf("%s\n", cur);
 }

@@ -7,6 +7,11 @@
             "label": "compile my project",
             "type": "shell",
             "command": "make -s compileProject g=-g"
+        },
+        {
+            "label": "compile test",
+            "type": "shell",
+            "command": "make -s testVector && ./main"
         }
     ]
 }

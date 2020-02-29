@@ -26,6 +26,10 @@ void freeVector(Vector *v, void (*freeValue)(void *)) {
 	if (freeValue != NULL)
 		for (int i = 0; i < v->size; i++)
 			freeValue(v->values[i]);
+	else
+		for (int i = 0; i < v->size; i++)
+			free(v->values[i]);
+
 	free(v->values);
 	v->values = NULL;
 	v->capacity = 0;
@@ -49,6 +53,13 @@ void *get(const Vector *v, int index) {
 	void *ret = malloc(v->sizeofEach);
 	memcpy(ret, v->values[index], v->sizeofEach);
 	return ret;
+}
+
+int forEach(const Vector *v, const void **element) {
+	assert(v != NULL);
+	static int index = 0;
+	*element = v->values[index];
+	return index++ < size(v) || (index = 0);
 }
 
 int add(Vector *v, const void *element) {

@@ -24,6 +24,8 @@ int capacity(const Vector *v);
 
 void *get(const Vector *v, int index);
 
+int forEach(const Vector *v, const void **element);
+
 int add(Vector *v, const void *element);
 
 int insert(Vector *v, int index, const void *element);
