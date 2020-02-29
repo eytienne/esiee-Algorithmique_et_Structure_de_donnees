@@ -6,7 +6,7 @@
         {
             "label": "compile my project",
             "type": "shell",
-            "command": "make -s compileProject"
+            "command": "make -s compileProject g=-g"
         }
     ]
 }

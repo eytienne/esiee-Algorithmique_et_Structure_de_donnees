@@ -2,7 +2,7 @@ runProject: compileProject
 	./main structures/PROJET/text.txt
 
 compileProject:
-	gcc -g \
+	gcc $g \
 		my_c_lib/BinaryPath.c \
 		my_c_lib/LinkedList.c \
 		my_c_lib/Queue.c \
