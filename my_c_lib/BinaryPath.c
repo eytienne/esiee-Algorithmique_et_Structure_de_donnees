@@ -13,9 +13,15 @@ BinaryPath *newBinaryPath() {
 	return newOne;
 }
 
+void freeBinaryPath(BinaryPath *bp) {
+	free(bp->bits);
+	bp->length = -1;
+	free(bp);
+}
+
 BinaryPath *bpcpy(BinaryPath *dest, const BinaryPath *src) {
 	size_t toCopy = src->length / 8 + (src->length % 8 != 0);
-	assert(dest->bits = realloc(dest->bits, toCopy));
+	assert(dest->bits = malloc(toCopy));
 	memcpy(dest->bits, src->bits, toCopy);
 	dest->length = src->length;
 	return dest;

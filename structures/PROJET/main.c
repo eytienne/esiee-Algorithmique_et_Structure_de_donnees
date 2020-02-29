@@ -1,4 +1,3 @@
-#include "../../my_c_lib/StackTrace.h"
 #include "compression.h"
 #include <signal.h>
 #include <stdio.h>
@@ -6,9 +5,6 @@
 #include <string.h>
 
 int main(int argc, char *argv[]) {
-	signal(SIGSEGV, printStackTrace);
-	signal(SIGABRT, printStackTrace);
-
 	FILE *src = NULL;
 	if (argc != 2) {
 		fputs("Give the file to test compression with as argument!\n", stderr);

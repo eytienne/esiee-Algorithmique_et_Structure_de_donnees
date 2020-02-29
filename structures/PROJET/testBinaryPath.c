@@ -2,12 +2,6 @@
 #include <stdio.h>
 
 int main(int argc, char const *argv[]) {
-	// for (unsigned char i = 0; i < 10; i++) {
-	// 	for (int j = 7; j >= 0; j--) {
-	// 		printf("%hhu ", ((i >> j) & 1) != 0);
-	// 	}
-	// 	printf("\n");
-	// }
 
 	unsigned char test[2];
 	test[1] = 17;

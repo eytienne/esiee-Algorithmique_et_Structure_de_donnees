@@ -8,7 +8,6 @@ compileProject:
 		my_c_lib/Queue.c \
 		my_c_lib/PriorityQueue.c \
 		my_c_lib/ShallowStack.c \
-		my_c_lib/StackTrace.c \
 		my_c_lib/TreeNode.c \
 		my_c_lib/Vector.c \
 		structures/PROJET/compression.c \

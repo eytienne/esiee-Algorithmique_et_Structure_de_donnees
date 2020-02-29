@@ -42,62 +42,46 @@ int printTN(const TreeNode *tn, void *buffer) {
 	return WALK_SUCCESS;
 }
 
-int __printLeavesWithBPaths(const TreeNode *t, void *buffer,
-							const BinaryPath *bp) {
-	assert(buffer != NULL);
-	void (*printer)(const void *) = (void (*)(const void *))buffer;
-
-	if (isLeaf(t)) {
-		printer(t->value);
-		printf(" -> ");
-		printBinaryPath(bp);
-		printf("\n");
-	}
-
-	return WALK_SUCCESS;
-}
-
 int __pickLeaves(const TreeNode *t, void *buffer, const BinaryPath *bp) {
 	assert(buffer != NULL);
 	Vector *leaves = buffer;
 	if (isLeaf(t)) {
 		const HuffmanPair *value = t->value;
-
 		HuffmanCode *newCode = malloc(sizeof(HuffmanCode));
 		newCode->c = value->c;
-		newCode->code = malloc(sizeof(BinaryPath));
+		newCode->code = newBinaryPath();
 		bpcpy(newCode->code, bp);
-
-		printf("'%c' -> ", newCode->c);
-		printBinaryPath(newCode->code);
-		printf("\n");
 		add(leaves, newCode);
 	}
 	return WALK_SUCCESS;
 }
 
+/**
+ * @return : Vector of HuffmanCode
+ */
 Vector *pickLeaves(const TreeNode *root) {
 	Vector *leaves = newVector(sizeof(HuffmanCode));
 	walkExpert(root, PREFIXE, __pickLeaves, leaves);
 	return leaves;
 }
 
-int ucharcmp(const void *a, const void *b) {
-	return *(unsigned char *)a - *(unsigned char *)b;
+int huffman_code_cmp(const void *a, const void *b) {
+	assert(a && b);
+	const HuffmanCode *c = *(const HuffmanCode **)a;
+	const HuffmanCode *d = *(const HuffmanCode **)b;
+	assert(c && d);
+	return c->c > d->c ? 1 : c->c < d->c ? -1 : 0;
 }
 
 void printLeavesWithBPaths(const TreeNode *root) {
-	// walkExpert(root, PREFIXE, __printLeavesWithBPaths, printHuffmanPairChar);
 	Vector *leaves = pickLeaves(root);
-	qsort(leaves, size(leaves), leaves->sizeofEach, ucharcmp);
+	qsort(leaves->values, size(leaves), sizeof(void *), huffman_code_cmp);
 	for (size_t i = 0; i < size(leaves); i++) {
-		printf("start loop\n");
 		const HuffmanCode *cur = leaves->values[i];
 		printf("%c -> ", cur->c);
 		printBinaryPath(cur->code);
-		printf("end loop\n");
+		printf("\n");
 	}
-	printf("end print\n");
 }
 
 void printPQTN(const PriorityQueue *pq) {
@@ -192,7 +176,6 @@ void compress(FILE *src, char *filename) {
 
 	TreeNode *huffmanHeap = NULL;
 	while (!isPQEmpty(pq)) {
-		printf("________________________________________\n");
 		huffmanHeap = shiftFromPriorityQueue(pq);
 		if (!isPQEmpty(pq)) {
 			TreeNode *toMergeWith = shiftFromPriorityQueue(pq);
@@ -203,12 +186,11 @@ void compress(FILE *src, char *filename) {
 			const HuffmanPair nonLeaf = {'@', priority};
 			TreeNode *merged = newTreeNode(&nonLeaf, sizeof(HuffmanPair),
 										   huffmanHeap, toMergeWith);
-			walkExpert(merged, PREFIXE, prefixPrint, printHuffmanPair);
 			addToPriorityQueue(pq, merged, priority);
 		}
 	}
 	printf("\nvvvvvvvvvvvvvvvvvvvvvvvvv\n");
-
+	walkExpert(huffmanHeap, PREFIXE, prefixPrint, printHuffmanPair);
 	printLeavesWithBPaths(huffmanHeap);
 }
 

@@ -47,6 +47,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 			   int (*function)(const TreeNode *, void *buffer,
 							   const BinaryPath *bp),
 			   void *buffer) {
+	int walkResult = WALK_SUCCESS;
 	BinaryPath *bp = newBinaryPath();
 	ShallowStack *parents = newShallowStack();
 	sstack(parents, root);
@@ -57,7 +58,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 	ShallowStack *toProcess = newShallowStack();
 	ShallowStack *TPR = newShallowStack();
 
-	while (!isSSEmpty(toVisit)) {
+	while (!isSSEmpty(toVisit) && walkResult == WALK_SUCCESS) {
 		const TreeNode *cur = unsstack(toVisit);
 		if (cur == NULL)
 			continue;
@@ -77,17 +78,14 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 		}
 		switch (p) {
 		case PREFIXE:
-			if (function(cur, buffer, bp))
-				return WALK_FAILURE;
+			walkResult = function(cur, buffer, bp);
 			sstack(toVisit, cur->right);
 			sstack(toVisit, cur->left);
 			break;
 		case INFIXE:
 			// left angle
 			if (cur->left == NULL) {
-				if (function(cur, buffer, bp))
-					return WALK_FAILURE;
-
+				walkResult = function(cur, buffer, bp);
 				if (cur->right != NULL) {
 					sstack(toVisit, cur->right);
 				} else {
@@ -95,8 +93,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 					// loop to come back while not finding right to visit
 					while (previousRight == NULL && !isSSEmpty(toProcess)) {
 						const TreeNode *previous = unsstack(toProcess);
-						if (function(previous, buffer, bp))
-							return WALK_FAILURE;
+						walkResult = function(previous, buffer, bp);
 						if (previous->right != NULL)
 							previousRight = previous->right;
 					}
@@ -108,17 +105,18 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 			}
 			break;
 		case POSTFIXE:
-			return postfixWalk_rec(cur, function, buffer);
+			walkResult = postfixWalk_rec(cur, function, buffer);
 			break;
 		default:
-			return WALK_FAILURE;
+			walkResult = WALK_FAILURE;
 		}
 		sstack(parents, cur);
 	}
 	freeShallowStack(toVisit);
 	freeShallowStack(toProcess);
 	freeShallowStack(TPR);
-	return WALK_SUCCESS;
+	freeBinaryPath(bp);
+	return walkResult;
 }
 
 typedef struct __walkApplyInfo {

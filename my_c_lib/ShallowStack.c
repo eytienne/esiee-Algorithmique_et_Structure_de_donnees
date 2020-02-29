@@ -2,6 +2,7 @@
 #include "ShallowStack.h"
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 ShallowStack *newShallowStack() {
 	ShallowStack *newOne = malloc(sizeof(ShallowStack));
