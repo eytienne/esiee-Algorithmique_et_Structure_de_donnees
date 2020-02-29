@@ -1,5 +1,5 @@
 runProject: compileProject
-	./main structures/PROJET/text.txt
+	./main structures/PROJET/us.txt
 
 compileProject:
 	gcc $g \

@@ -126,6 +126,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 		}
 		sstack(parents, cur);
 	}
+	freeShallowStack(parents);
 	freeShallowStack(toVisit);
 	freeShallowStack(toProcess);
 	freeShallowStack(TPR);

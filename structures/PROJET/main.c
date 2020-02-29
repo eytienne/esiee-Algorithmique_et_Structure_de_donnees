@@ -6,17 +6,19 @@
 
 int main(int argc, char *argv[]) {
 	FILE *src = NULL;
-	if (argc != 2) {
+	if (argc < 2) {
 		fputs("Give the file to test compression with as argument!\n", stderr);
 		exit(EXIT_FAILURE);
 	}
 	char *filename = argv[1];
 	src = fopen(filename, "r");
 	size_t len = strlen(filename);
-	char *output = malloc(len + 4);
+	char *output = malloc(len + 4); // 4 = length of ".hf" + 1 for the null-terminator
 	strcpy(output, filename);
-	strcat(output, ".bin");
-	compress(src, output);
+	strcat(output, ".hf");
+	HuffmanTree ht = compress(src, output);
+	freeTreeNode(ht, NULL);
+	free(output);
 	fclose(src);
 	return 0;
 }

@@ -58,8 +58,13 @@ void *get(const Vector *v, int index) {
 int forEach(const Vector *v, const void **element) {
 	assert(v != NULL);
 	static int index = 0;
-	*element = v->values[index];
-	return index++ < size(v) || (index = 0);
+	if (index < size(v)) {
+		*element = v->values[index++];
+		return 1;
+	} else {
+		index = 0;
+		return 0;
+	}
 }
 
 int add(Vector *v, const void *element) {
@@ -84,12 +89,12 @@ int insert(Vector *v, int index, const void *element) {
 			v->values[i] = v->values[i - 1];
 	}
 
-	void *newOne = malloc(sizeof(v->sizeofEach));
+	void *newOne = malloc(v->sizeofEach);
 	memcpy(newOne, element, v->sizeofEach);
 	v->values[index] = newOne;
 
 	v->size++;
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 void set(Vector *v, int index, const void *element) {
@@ -125,14 +130,14 @@ int delete (Vector *v, int start, int end) {
 		if (failed)
 			return failed;
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int adjust(Vector *v) {
 	assert(v != NULL);
 	if (v->size < v->capacity)
 		return changeCapactity(v, v->size);
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int changeCapactity(Vector *v, size_t newCapacity) {

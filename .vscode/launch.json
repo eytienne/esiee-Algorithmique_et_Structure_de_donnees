@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/main",
             "args": [
-                "structures/PROJET/text.txt"
+                "structures/PROJET/us.txt"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
