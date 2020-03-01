@@ -1,7 +1,7 @@
 #ifndef TREE_NODE_H
 #define TREE_NODE_H
 
-#include "BinaryPath.h"
+#include "BinarySequence.h"
 #include "ShallowStack.h"
 #include <stddef.h>
 
@@ -25,7 +25,7 @@ int isParent(const TreeNode *from, const TreeNode *it);
 
 int walkExpert(const TreeNode *root, enum PATHWAY p,
 				 int (*function)(const TreeNode *, void *buffer,
-								 const BinaryPath *bp),
+								 const BinarySequence *bs),
 				 void *buffer);
 
 int walk(const TreeNode *t, enum PATHWAY p,
@@ -46,6 +46,6 @@ int printTreeNode(const TreeNode *t, void *pi);
 
 void printTreeNode2(const TreeNode *t, void (*printer)(const void *value));
 
-int prefixPrint(const TreeNode *t, void *buffer, const BinaryPath *bp);
+int prefixPrint(const TreeNode *t, void *buffer, const BinarySequence *bs);
 
 #endif

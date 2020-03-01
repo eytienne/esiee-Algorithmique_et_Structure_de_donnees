@@ -1,6 +1,6 @@
 
 #include "../../my_c_lib/BSTree.h"
-#include "../../my_c_lib/BinaryPath.h"
+#include "../../my_c_lib/BinarySequence.h"
 #include "../../my_c_lib/StackTrace.h"
 #include "../../my_c_lib/Vector.h"
 #include <assert.h>
@@ -16,12 +16,12 @@ void intprint(const void *v) {
 	printf("%d", *(int *)v);
 }
 
-int __pickLeaves(const TreeNode *t, void *buffer, const BinaryPath *bp) {
+int __pickLeaves(const TreeNode *t, void *buffer, const BinarySequence *bs) {
 	assert(buffer != NULL);
 	Vector *leaves = buffer;
 	const int *value = t->value;
 	printf("'%d' -> ", *value);
-	printBinaryPath(bp);
+	printBinarySequence(bs);
 	printf("\n");
 	add(leaves, &value);
 	return WALK_SUCCESS;

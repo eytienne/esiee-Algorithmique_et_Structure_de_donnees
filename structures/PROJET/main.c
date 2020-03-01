@@ -105,6 +105,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr,
 				"hzip: '%s' is not a hzip command. See 'hzip --help'.\n",
 				argv[1]);
+		free(output);
 		exit(EXIT_FAILURE);
 	}
 

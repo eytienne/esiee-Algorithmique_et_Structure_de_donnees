@@ -1,4 +1,5 @@
 #include "hzip.h"
+#include "../../my_c_lib/BinarySequence.h"
 #include "../../my_c_lib/PriorityQueue.h"
 #include "../../my_c_lib/TreeNode.h"
 #include "../../my_c_lib/Vector.h"
@@ -11,7 +12,7 @@
 
 typedef struct HuffmanCode {
 	unsigned char c;
-	BinaryPath *code;
+	BinarySequence *code;
 } HuffmanCode;
 
 void printHuffmanPair(const HuffmanPair *hp) {
@@ -22,19 +23,19 @@ void printHuffmanTree(const HuffmanTree ht) {
 	walkExpert(ht, PREFIXE, prefixPrint, printHuffmanPair);
 }
 void freeHuffmanCode(HuffmanCode *hc) {
-	freeBinaryPath(hc->code);
+	freeBinarySequence(hc->code);
 	free(hc);
 }
 
-int __pickLeaves(const TreeNode *t, void *buffer, const BinaryPath *bp) {
+int __pickLeaves(const TreeNode *t, void *buffer, const BinarySequence *bs) {
 	assert(buffer != NULL);
 	Vector *leaves = buffer;
 	if (isLeaf(t)) {
 		const HuffmanPair *value = t->value;
 		HuffmanCode newCode;
 		newCode.c = value->c;
-		newCode.code = newBinaryPath();
-		bpcpy(newCode.code, bp);
+		newCode.code = newBinarySequence();
+		bscpy(newCode.code, bs);
 		add(leaves, &newCode);
 	}
 	return WALK_SUCCESS;
@@ -62,8 +63,8 @@ void printHuffmanTable(const HuffmanTree ht) {
 	qsort(leaves->values, size(leaves), sizeof(void *), huffman_code_cmp);
 	const HuffmanCode *cur = NULL;
 	while (forEach(leaves, (const void **)&cur)) {
-		printf("'%c' %d -> ", cur->c, cur->c);
-		printBinaryPath(cur->code);
+		printf("'%c' -> ", cur->c);
+		printBinarySequence(cur->code);
 		printf("\n");
 	}
 	freeVector(leaves, (void (*)(void *))freeHuffmanCode);
@@ -164,6 +165,5 @@ HuffmanTree compress(FILE *src, char *filename) {
 	return huffmanHeap;
 }
 
-HuffmanTree uncompress(FILE *dest, char *filename){
-
+HuffmanTree uncompress(FILE *dest, char *filename) {
 }

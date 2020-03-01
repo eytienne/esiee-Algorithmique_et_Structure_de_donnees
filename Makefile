@@ -2,8 +2,8 @@ runProject: compileProject
 	./hzip compress structures/PROJET/us.txt
 
 compileProject:
-	gcc $g \
-		my_c_lib/BinaryPath.c \
+	gcc \
+		my_c_lib/BinarySequence.c \
 		my_c_lib/LinkedList.c \
 		my_c_lib/Queue.c \
 		my_c_lib/PriorityQueue.c \
@@ -12,11 +12,11 @@ compileProject:
 		my_c_lib/Vector.c \
 		structures/PROJET/hzip.c \
 		structures/PROJET/main.c \
-		-o hzip
+		-o hzip $g
 
 staticCheckProject:
 	frama-c \
-		my_c_lib/BinaryPath.c \
+		my_c_lib/BinarySequence.c \
 		my_c_lib/LinkedList.c \
 		my_c_lib/Queue.c \
 		my_c_lib/PriorityQueue.c \
@@ -27,11 +27,12 @@ staticCheckProject:
 		structures/PROJET/main.c \
 
 valgrindProject: compileProject
-	valgrind --leak-check=yes --tool=memcheck --num-callers=16 --leak-resolution=high ./main structures/PROJET/us.txt
+	valgrind --leak-check=full --show-leak-kinds=all --tool=memcheck --num-callers=16 --leak-resolution=high \
+		./hzip compress --table structures/PROJET/us.txt
 
 testTree:
 	gcc -g -rdynamic \
-		my_c_lib/BinaryPath.c \
+		my_c_lib/BinarySequence.c \
 		my_c_lib/ShallowStack.c \
 		my_c_lib/StackTrace.c \
 		my_c_lib/*Tree*.c \
@@ -39,12 +40,12 @@ testTree:
 		structures/TP5/testTree2.c \
 		-o main \
 
-testBinaryPath:
+testBinarySequence:
 	gcc \
-		my_c_lib/BinaryPath.c \
+		my_c_lib/BinarySequence.c \
 		my_c_lib/ShallowStack.c \
 		my_c_lib/*Tree*.c \
-		structures/PROJET/testBinaryPath.c \
+		structures/PROJET/testBinarySequence.c \
 		-o main \
 
 testShallowStack:

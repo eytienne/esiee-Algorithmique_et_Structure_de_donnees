@@ -1,5 +1,5 @@
 #include "TreeNode.h"
-#include "BinaryPath.h"
+#include "BinarySequence.h"
 #include "ShallowStack.h"
 #include <assert.h>
 #include <stdio.h>
@@ -44,7 +44,7 @@ int isParent(const TreeNode *son, const TreeNode *it) {
 
 int postfixWalk_rec(const TreeNode *tn,
 					int (*function)(const TreeNode *, void *buffer,
-									const BinaryPath *bp),
+									const BinarySequence *bs),
 					void *buffer) {
 	if (tn == NULL)
 		return WALK_SUCCESS;
@@ -59,10 +59,10 @@ int postfixWalk_rec(const TreeNode *tn,
 
 int walkExpert(const TreeNode *root, enum PATHWAY p,
 			   int (*function)(const TreeNode *, void *buffer,
-							   const BinaryPath *bp),
+							   const BinarySequence *bs),
 			   void *buffer) {
 	int walkResult = WALK_SUCCESS;
-	BinaryPath *bp = newBinaryPath();
+	BinarySequence *bs = newBinarySequence();
 	ShallowStack *parents = newShallowStack();
 	sstack(parents, root);
 
@@ -80,26 +80,26 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 			   !isParent(cur, (const TreeNode *)top(parents))) {
 			unsstack(parents);
 			if (!isSSEmpty(parents))
-				goBack(bp);
+				shorten(bs);
 		}
 		if (!isSSEmpty(parents)) {
 			const TreeNode *father = top(parents);
 			if (father->left == cur) {
-				goToLeft(bp);
+				addZero(bs);
 			} else if (father->right == cur) {
-				goToRight(bp);
+				addOne(bs);
 			}
 		}
 		switch (p) {
 		case PREFIXE:
-			walkResult = function(cur, buffer, bp);
+			walkResult = function(cur, buffer, bs);
 			sstack(toVisit, cur->right);
 			sstack(toVisit, cur->left);
 			break;
 		case INFIXE:
 			// left angle
 			if (cur->left == NULL) {
-				walkResult = function(cur, buffer, bp);
+				walkResult = function(cur, buffer, bs);
 				if (cur->right != NULL) {
 					sstack(toVisit, cur->right);
 				} else {
@@ -107,7 +107,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 					// loop to come back while not finding right to visit
 					while (previousRight == NULL && !isSSEmpty(toProcess)) {
 						const TreeNode *previous = unsstack(toProcess);
-						walkResult = function(previous, buffer, bp);
+						walkResult = function(previous, buffer, bs);
 						if (previous->right != NULL)
 							previousRight = previous->right;
 					}
@@ -130,7 +130,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 	freeShallowStack(toVisit);
 	freeShallowStack(toProcess);
 	freeShallowStack(TPR);
-	freeBinaryPath(bp);
+	freeBinarySequence(bs);
 	return walkResult;
 }
 
@@ -139,7 +139,7 @@ typedef struct __walkApplyInfo {
 	void *buffer;
 } __walkApplyInfo;
 
-int __walkApply(const TreeNode *tn, void *buffer, const BinaryPath *bp) {
+int __walkApply(const TreeNode *tn, void *buffer, const BinarySequence *bs) {
 	__walkApplyInfo *wai = buffer;
 	return wai->function(tn, wai->buffer);
 }
@@ -152,7 +152,7 @@ int walk(const TreeNode *root, enum PATHWAY p,
 
 int transformExpert(TreeNode *root, enum PATHWAY p,
 					int (*function)(TreeNode *, void *buffer,
-									const BinaryPath *bp),
+									const BinarySequence *bs),
 					void *buffer) {
 	return walk(root, p, (int (*)(const TreeNode *, void *))function, buffer);
 }
@@ -161,7 +161,7 @@ int transform(TreeNode *root, enum PATHWAY p,
 			  int (*function)(TreeNode *, void *buffer), void *buffer) {
 	__walkApplyInfo wai = {(int (*)(const TreeNode *, void *))function, buffer};
 	return transformExpert(
-		root, p, (int (*)(TreeNode *, void *, const BinaryPath *))__walkApply,
+		root, p, (int (*)(TreeNode *, void *, const BinarySequence *))__walkApply,
 		&wai);
 }
 
@@ -196,14 +196,14 @@ void printTreeNode2(const TreeNode *t, void (*printer)(const void *value)) {
 	printf("}");
 }
 
-int prefixPrint(const TreeNode *t, void *buffer, const BinaryPath *bp) {
+int prefixPrint(const TreeNode *t, void *buffer, const BinarySequence *bs) {
 	assert(buffer != NULL);
 	void (*printer)(const void *) = (void (*)(const void *))buffer;
 
-	for (int i = 1; i < bp->length; i++)
+	for (int i = 1; i < bs->length; i++)
 		printf("\t");
-	if (bp->length > 0)
-		printf("\\--%d--", getBPStep(bp, bp->length - 1));
+	if (bs->length > 0)
+		printf("\\--%d--", getBit(bs, bs->length - 1));
 	printer(t->value);
 	printf("\n");
 
