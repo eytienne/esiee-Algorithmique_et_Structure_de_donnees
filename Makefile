@@ -1,5 +1,5 @@
 runProject: compileProject
-	./main structures/PROJET/us.txt
+	./hzip compress structures/PROJET/us.txt
 
 compileProject:
 	gcc $g \
@@ -12,9 +12,9 @@ compileProject:
 		my_c_lib/Vector.c \
 		structures/PROJET/hzip.c \
 		structures/PROJET/main.c \
-		-o main
+		-o hzip
 
-checkProject:
+staticCheckProject:
 	frama-c \
 		my_c_lib/BinaryPath.c \
 		my_c_lib/LinkedList.c \
@@ -25,6 +25,9 @@ checkProject:
 		my_c_lib/Vector.c \
 		structures/PROJET/hzip.c \
 		structures/PROJET/main.c \
+
+valgrindProject: compileProject
+	valgrind --leak-check=yes --tool=memcheck --num-callers=16 --leak-resolution=high ./main structures/PROJET/us.txt
 
 testTree:
 	gcc -g -rdynamic \

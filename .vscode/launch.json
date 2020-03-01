@@ -8,8 +8,9 @@
             "name": "(gdb) debug my project",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/main",
+            "program": "${workspaceFolder}/hzip",
             "args": [
+                "compress",
                 "structures/PROJET/us.txt"
             ],
             "stopAtEntry": false,

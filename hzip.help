@@ -1,0 +1,16 @@
+USAGE: hzip <command> [-o <output_path>] [--tree] [--table] <filename>
+
+
+Commands:
+    
+    compress        Compress <filename> to <filename>.hf or to <output_path> if given
+
+    uncompress      Uncompress <filename> to <filename>.hf or to <output_path> if given
+
+
+Options:
+
+    --tree          Print the Huffman tree behind the compression. 
+
+    --table         Print the coding table ordered alphabetically. 
+

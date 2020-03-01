@@ -6,8 +6,17 @@
 
 typedef TreeNode *HuffmanTree;
 
+typedef struct HuffmanPair {
+	unsigned char c;
+	unsigned int count;
+} HuffmanPair;
+
 HuffmanTree compress(FILE *src, char *filename);
 
-void uncompress(FILE *dest, char *filename);
+HuffmanTree uncompress(FILE *dest, char *filename);
+
+void printHuffmanTree(const HuffmanTree ht);
+
+void printHuffmanTable(const HuffmanTree ht);
 
 #endif
