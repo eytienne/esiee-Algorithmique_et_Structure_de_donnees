@@ -27,6 +27,18 @@ BinarySequence *bscpy(BinarySequence *dest, const BinarySequence *src) {
 	return dest;
 }
 
+BinarySequence *bscat(BinarySequence *dest, const BinarySequence *src) {
+	for (size_t i = 0; i < src->length; i++)
+		switch (getBit(src, i)) {
+		case ONE:
+			addOne(dest);
+			break;
+		case ZERO:
+			addZero(dest);
+		}
+	return dest;
+}
+
 void __goTo(BinarySequence *bs, enum DIRECTION d) {
 	size_t i = bs->length / 8;
 	if (bs->length % 8 == 0) {
@@ -67,8 +79,12 @@ int getBit(const BinarySequence *bs, size_t index) {
 }
 
 void printBinarySequence(const BinarySequence *bs) {
+	fprintBinarySequence(bs, stdout);
+}
+
+void fprintBinarySequence(const BinarySequence *bs, FILE *restrict stream) {
 	for (size_t i = 0; i < bs->length; i++) {
-		printf("%hhu", getBit(bs, i));
+		fprintf(stream, "%hhu", getBit(bs, i));
 		if ((i + 1) % 8 == 0)
 			printf(" ");
 	}

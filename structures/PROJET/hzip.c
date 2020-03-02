@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TAILLE_MAX 1000
 #define ASCII_TABLE_SIZE 256
 
 typedef struct HuffmanCode {
@@ -126,18 +125,17 @@ int __getTraversal(const TreeNode *tn, void *buffer, const BinarySequence *bs) {
 }
 
 HuffmanTree compress(FILE *src, char *filename) {
-	unsigned char buffer[TAILLE_MAX] = {0};
+	unsigned char buffer[BUFSIZ] = {0};
 	int counters[ASCII_TABLE_SIZE] = {0};
 	size_t sizeOfText = 0;
-	while (!feof(src) && fgets((char *)buffer, TAILLE_MAX, src) != NULL) {
-		int i = 0;
-		while (i < TAILLE_MAX) {
+	while (!feof(src) &&
+		   fread((char *)buffer, sizeof(unsigned char), BUFSIZ, src) > 0) {
+		size_t i = 0;
+		for (; i < BUFSIZ; i++) {
 			if (buffer[i] == '\0')
 				break;
 			printf("%c", buffer[i]);
 			counters[buffer[i]]++;
-			if (buffer[i++] == '\n')
-				break;
 		}
 		sizeOfText += i;
 	}
@@ -184,26 +182,59 @@ HuffmanTree compress(FILE *src, char *filename) {
 	}
 	freePriorityQueue(pq, NULL);
 
-	if (0) {
-		FILE *output_stream = fopen(filename, "w");
+	// if (0) {
+	FILE *output_stream = fopen(filename, "w");
 
-		fprintf(output_stream, "%lu", sizeOfText);
-		fprintf(output_stream, "%hhu", sizeOfTable);
+	fprintf(output_stream, "%lu", sizeOfText);
+	fprintf(output_stream, "%hhu", sizeOfTable);
 
-		BinarySequence *codes[ASCII_TABLE_SIZE] = {NULL};
-		Vector *leaves = pickLeaves(huffmanHeap);
-		HuffmanCode *cur = NULL;
-		while (forEach(v, (const void **)&cur)) {
-			fputc(cur->c, output_stream);
-			codes[cur->c] = cur->code;
-		}
+	BinarySequence *codes[ASCII_TABLE_SIZE] = {NULL};
+	Vector *leaves = pickLeaves(huffmanHeap);
+	HuffmanCode *cur = NULL;
+	while (forEach(leaves, (const void **)&cur)) {
+		fputc(cur->c, output_stream);
+		codes[cur->c] = cur->code;
 	}
 	TraversalInfo ti = {0, newBinarySequence()};
 	walkExpert(huffmanHeap, INFIXE, __getTraversal, &ti);
 	printBinarySequence(ti.traversal);
 	printf("\n");
-
+	addOne(ti.traversal);
+	int bytesToCopy =
+		ti.traversal->length / 8 + (ti.traversal->length % 8 != 0);
+	fwrite(ti.traversal->bits, sizeof(unsigned char), bytesToCopy,
+		   output_stream);
 	rewind(src);
+
+	BinarySequence *toWrite = newBinarySequence();
+	int j = 0;
+	while (!feof(src) &&
+		   fread((char *)buffer, sizeof(unsigned char), BUFSIZ, src) > 0) {
+		for (size_t i = 0; i < BUFSIZ; i++) {
+			if (buffer[i] == '\0')
+				break;
+			assert(codes[buffer[i]] != NULL);
+			bscat(toWrite, codes[buffer[i]]);
+			if (toWrite->length * 8 >= BUFSIZ) {
+				BinarySequence *reset = newBinarySequence();
+				int flushed = toWrite->length / 8;
+				fwrite(toWrite->bits, sizeof(unsigned char), flushed,
+					   output_stream);
+				if (toWrite->length % 8 != 0) {
+					reset->length = toWrite->length % 8;
+					reset->bits[0] = toWrite->bits[flushed];
+				}
+				freeBinarySequence(toWrite);
+				toWrite = reset;
+			}
+			++j;
+		}
+	}
+	fwrite(toWrite->bits, sizeof(unsigned char),
+		   toWrite->length / 8 + toWrite->length % 8 != 0, output_stream);
+	fclose(output_stream);
+	rewind(src);
+	// }
 	return huffmanHeap;
 }
 
