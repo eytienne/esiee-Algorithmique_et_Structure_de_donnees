@@ -1,3 +1,4 @@
+#include "../../my_c_lib/FileUtils.h"
 #include "hzip.h"
 #include <assert.h>
 #include <signal.h>
@@ -6,22 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#define HZIP_EXTENSION ".hf"
+
 #define MIN_ARGS 3
 #define MAX_ARGS 7
-
-#ifdef _WIN32
-#define FILE_SEPARATOR '\\'
-#else
-#define FILE_SEPARATOR '/'
-#endif
-
-static int fexists(const char *filename) {
-	return !access(filename, F_OK);
-}
-
-static char *basename(const char *filename) {
-	return strrchr(filename, FILE_SEPARATOR);
-}
 
 static int option_cmp(const void *a, const void *b) {
 	assert(a && b);
@@ -45,7 +34,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	char *filename = NULL;
-	char *output_path = NULL;
+	char *output_filename = NULL;
 
 	int printTree = -1;
 	int printTable = -1;
@@ -53,7 +42,23 @@ int main(int argc, char *argv[]) {
 	int *options[] = {&printTree, &printTable};
 
 	for (int i = 2; i < argc && i <= MAX_ARGS; i++) {
-		if (strncmp(argv[i], "--", 2) == 0) {
+		if (strcmp(argv[i], "-o") == 0) {
+			++i;
+			if (!(i < argc && i <= MAX_ARGS)) {
+				fputs("hzip: -o should be followed by <output_filename>.\n",
+					  stderr);
+				exit(EXIT_FAILURE);
+			}
+			char *output_path_given = getPath(argv[i]);
+			if (!direxists(output_path_given)) {
+				fprintf(stderr,
+						"hzip: Invalid output filename '%s' : No such "
+						"directory.\n",
+						argv[i]);
+				exit(EXIT_FAILURE);
+			}
+			output_filename = argv[i];
+		} else if (strncmp(argv[i], "--", 2) == 0) {
 			if (strcmp(argv[i] + 2, "help") == 0) {
 				printHelp();
 				exit(EXIT_SUCCESS);
@@ -70,11 +75,11 @@ int main(int argc, char *argv[]) {
 			}
 		} else {
 			if (filename != NULL) {
-				fputs("hzip: only one filename can be given\n", stderr);
+				fputs("hzip: only one filename can be given.\n", stderr);
 				exit(EXIT_FAILURE);
 			}
 			if (!fexists(argv[i])) {
-				fprintf(stderr, "hzip: cannot access '%s': No such file\n",
+				fprintf(stderr, "hzip: cannot access '%s': No such file.\n",
 						argv[i]);
 				exit(EXIT_FAILURE);
 			}
@@ -82,30 +87,44 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	if (filename == NULL) {
-		fputs("hzip: filename should be given\n", stderr);
+		fputs("hzip: filename should be given.\n", stderr);
 		exit(EXIT_FAILURE);
 	}
-
-	size_t len = strlen(filename);
-	char *output =
-		malloc(len + 4); // 4 = length of ".hf" + 1 for the null-terminator
-	strcpy(output, filename);
-	strcat(output, ".hf");
 
 	HuffmanTree ht = NULL;
 	if (strcmp(argv[1], "compress") == 0) {
 		FILE *src = fopen(filename, "r");
-		ht = compress(src, output_path);
+		if (output_filename == NULL) {
+			size_t len = strlen(filename);
+			output_filename = malloc(len + strlen(HZIP_EXTENSION));
+			strcpy(output_filename, filename);
+			strcat(output_filename, HZIP_EXTENSION);
+		}
+		ht = compress(src, output_filename);
 		fclose(src);
 	} else if (strcmp(argv[1], "uncompress") == 0) {
+		if (output_filename == NULL) {
+			char *ext = strstr(filename, HZIP_EXTENSION);
+			if (ext != NULL) {
+				size_t len = ext - filename;
+				output_filename = malloc(len);
+				strncpy(output_filename, filename, len);
+			} else {
+				size_t len = strlen(filename);
+				const char *toConcat = " (extracted)";
+				output_filename = malloc(len + strlen(toConcat));
+				strcpy(output_filename, filename);
+				output_filename[len] = '\0';
+				strcat(output_filename, toConcat);
+			}
+		}
 		FILE *dest = stdout;
-		ht = uncompress(dest, output_path);
+		ht = uncompress(dest, output_filename);
 		fclose(dest);
 	} else {
 		fprintf(stderr,
 				"hzip: '%s' is not a hzip command. See 'hzip --help'.\n",
 				argv[1]);
-		free(output);
 		exit(EXIT_FAILURE);
 	}
 
@@ -122,6 +141,5 @@ int main(int argc, char *argv[]) {
 	}
 
 	freeTreeNode(ht, NULL);
-	free(output);
 	return 0;
 }

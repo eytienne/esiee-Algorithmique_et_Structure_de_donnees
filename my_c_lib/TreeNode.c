@@ -64,35 +64,36 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 	int walkResult = WALK_SUCCESS;
 	BinarySequence *bs = newBinarySequence();
 	ShallowStack *parents = newShallowStack();
-	sstack(parents, root);
 
 	ShallowStack *toVisit = newShallowStack();
 	sstack(toVisit, root);
 
-	ShallowStack *toProcess = newShallowStack();
+	ShallowStack *toProcess =
+		newShallowStack(); // marked: visited but not processed
 	ShallowStack *TPR = newShallowStack();
 
-	while (!isSSEmpty(toVisit) && walkResult == WALK_SUCCESS) {
+	while (!isSSEmpty(toVisit) && walkResult != WALK_FAILURE) {
 		const TreeNode *cur = unsstack(toVisit);
 		if (cur == NULL)
 			continue;
-		while (!isSSEmpty(parents) &&
-			   !isParent(cur, (const TreeNode *)top(parents))) {
-			unsstack(parents);
-			if (!isSSEmpty(parents))
-				shorten(bs);
-		}
-		if (!isSSEmpty(parents)) {
-			const TreeNode *father = top(parents);
-			if (father->left == cur) {
-				addZero(bs);
-			} else if (father->right == cur) {
-				addOne(bs);
+		switch (p) {
+		case PREFIXE: {
+			while (!isSSEmpty(parents) && !isParent(cur, top(parents))) {
+				unsstack(parents);
+				if (!isSSEmpty(parents))
+					shorten(bs);
+			}
+			if (!isSSEmpty(parents)) {
+				const TreeNode *father = top(parents);
+				if (father->left == cur) {
+					addZero(bs);
+				} else if (father->right == cur) {
+					addOne(bs);
+				}
 			}
 		}
-		switch (p) {
-		case PREFIXE:
 			walkResult = function(cur, buffer, bs);
+			sstack(parents, cur);
 			sstack(toVisit, cur->right);
 			sstack(toVisit, cur->left);
 			break;
@@ -100,21 +101,26 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 			// left angle
 			if (cur->left == NULL) {
 				walkResult = function(cur, buffer, bs);
-				if (cur->right != NULL) {
-					sstack(toVisit, cur->right);
-				} else {
-					const TreeNode *previousRight = NULL;
-					// loop to come back while not finding right to visit
-					while (previousRight == NULL && !isSSEmpty(toProcess)) {
-						const TreeNode *previous = unsstack(toProcess);
-						walkResult = function(previous, buffer, bs);
-						if (previous->right != NULL)
-							previousRight = previous->right;
+
+				// loop to come back while not finding right to visit
+				while (cur->right == NULL && !isSSEmpty(toProcess)) {
+					cur = unsstack(toProcess);
+					while (!isSSEmpty(parents) &&
+						   !isParent(cur, top(parents))) {
+						unsstack(parents);
+						shorten(bs);
 					}
-					sstack(toVisit, previousRight);
+					walkResult = function(cur, buffer, bs);
+				}
+				if (cur->right != NULL) {
+					sstack(parents, cur);
+					addOne(bs);
+					sstack(toVisit, cur->right);
 				}
 			} else {
 				sstack(toProcess, cur);
+				sstack(parents, cur);
+				addZero(bs);
 				sstack(toVisit, cur->left);
 			}
 			break;
@@ -124,7 +130,6 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 		default:
 			walkResult = WALK_FAILURE;
 		}
-		sstack(parents, cur);
 	}
 	freeShallowStack(parents);
 	freeShallowStack(toVisit);
@@ -161,8 +166,8 @@ int transform(TreeNode *root, enum PATHWAY p,
 			  int (*function)(TreeNode *, void *buffer), void *buffer) {
 	__walkApplyInfo wai = {(int (*)(const TreeNode *, void *))function, buffer};
 	return transformExpert(
-		root, p, (int (*)(TreeNode *, void *, const BinarySequence *))__walkApply,
-		&wai);
+		root, p,
+		(int (*)(TreeNode *, void *, const BinarySequence *))__walkApply, &wai);
 }
 
 int countTreeNodeNodes(const TreeNode *t, void *counter) {

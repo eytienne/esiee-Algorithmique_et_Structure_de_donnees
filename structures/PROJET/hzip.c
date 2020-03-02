@@ -46,7 +46,7 @@ int __pickLeaves(const TreeNode *t, void *buffer, const BinarySequence *bs) {
  */
 Vector *pickLeaves(const TreeNode *root) {
 	Vector *leaves = newVector(sizeof(HuffmanCode));
-	walkExpert(root, PREFIXE, __pickLeaves, leaves);
+	walkExpert(root, INFIXE, __pickLeaves, leaves);
 	return leaves;
 }
 
@@ -104,10 +104,31 @@ int huffman_pair_cmp(const void *a, const void *b) {
 	return d->count - c->count;
 }
 
+typedef struct TraversalInfo {
+	int last;
+	BinarySequence *traversal;
+} TraversalInfo;
+
+int __getTraversal(const TreeNode *tn, void *buffer, const BinarySequence *bs) {
+	const HuffmanPair *hp = tn->value;
+	TraversalInfo *ti = buffer;
+	printf("('%c' %d, code :", hp->c, hp->count);
+	printBinarySequence(bs);
+	printf(")\n");
+	if (ti->last < bs->length)
+		for (int i = ti->last; i < bs->length; i++)
+			addZero(ti->traversal);
+	else if (ti->last > bs->length) {
+		for (int i = ti->last; i > bs->length; i--)
+			addOne(ti->traversal);
+	}
+	ti->last = bs->length;
+}
+
 HuffmanTree compress(FILE *src, char *filename) {
 	unsigned char buffer[TAILLE_MAX] = {0};
 	int counters[ASCII_TABLE_SIZE] = {0};
-
+	size_t sizeOfText = 0;
 	while (!feof(src) && fgets((char *)buffer, TAILLE_MAX, src) != NULL) {
 		int i = 0;
 		while (i < TAILLE_MAX) {
@@ -115,10 +136,10 @@ HuffmanTree compress(FILE *src, char *filename) {
 				break;
 			printf("%c", buffer[i]);
 			counters[buffer[i]]++;
-			if (buffer[i] == '\n')
+			if (buffer[i++] == '\n')
 				break;
-			i++;
 		}
+		sizeOfText += i;
 	}
 	printf("\n----------------------\n");
 
@@ -129,9 +150,10 @@ HuffmanTree compress(FILE *src, char *filename) {
 			add(v, &toAdd);
 		}
 	}
+	unsigned char sizeOfTable = size(v);
+
 	qsort(v->values, size(v), sizeof(void *), huffman_pair_cmp);
 	// printVectorOfHP(v);
-
 	HuffmanPair **values = (HuffmanPair **)v->values;
 
 	PriorityQueue *pq = newPriorityQueue(sizeof(TreeNode));
@@ -162,6 +184,26 @@ HuffmanTree compress(FILE *src, char *filename) {
 	}
 	freePriorityQueue(pq, NULL);
 
+	if (0) {
+		FILE *output_stream = fopen(filename, "w");
+
+		fprintf(output_stream, "%lu", sizeOfText);
+		fprintf(output_stream, "%hhu", sizeOfTable);
+
+		BinarySequence *codes[ASCII_TABLE_SIZE] = {NULL};
+		Vector *leaves = pickLeaves(huffmanHeap);
+		HuffmanCode *cur = NULL;
+		while (forEach(v, (const void **)&cur)) {
+			fputc(cur->c, output_stream);
+			codes[cur->c] = cur->code;
+		}
+	}
+	TraversalInfo ti = {0, newBinarySequence()};
+	walkExpert(huffmanHeap, INFIXE, __getTraversal, &ti);
+	printBinarySequence(ti.traversal);
+	printf("\n");
+
+	rewind(src);
 	return huffmanHeap;
 }
 

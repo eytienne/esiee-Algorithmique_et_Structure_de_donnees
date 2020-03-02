@@ -1,11 +1,11 @@
-USAGE: hzip <command> [-o <output_path>] [--tree] [--table] <filename>
+USAGE: hzip <command> [-o <output_filename>] [--tree] [--table] <filename>
 
 
 Commands:
     
-    compress        Compress <filename> to <filename>.hf or to <output_path> if given
+    compress        Compress <filename> to <filename>.hf or to <output_filename> if given
 
-    uncompress      Uncompress <filename> to <filename>.hf or to <output_path> if given
+    uncompress      Uncompress <filename> to <filename>.hf or to <output_filename> if given
 
 
 Options:

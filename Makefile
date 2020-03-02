@@ -4,6 +4,7 @@ runProject: compileProject
 compileProject:
 	gcc \
 		my_c_lib/BinarySequence.c \
+		my_c_lib/FileUtils.c \
 		my_c_lib/LinkedList.c \
 		my_c_lib/Queue.c \
 		my_c_lib/PriorityQueue.c \
@@ -17,6 +18,7 @@ compileProject:
 staticCheckProject:
 	frama-c \
 		my_c_lib/BinarySequence.c \
+		my_c_lib/FileUtils.c \
 		my_c_lib/LinkedList.c \
 		my_c_lib/Queue.c \
 		my_c_lib/PriorityQueue.c \
