@@ -33,10 +33,31 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
+	BinarySequence *bsCopy = newBinarySequence();
+
 	for (int i = 0; i < 16; i++) {
 		shorten(bs);
 		printBinarySequence(bs);
 		printf("\n");
+		if (i == 3) {
+			bscpy(bsCopy, bs);
+			printBinarySequence(bsCopy);
+			printf("\n");
+		}
+		if (i == 11) {
+			printBinarySequence(bsCopy);
+			printf(" (copy)\n");
+			bscat(bsCopy, bs);
+			printBinarySequence(bsCopy);
+			printf(" (copy)\n");
+		}
+		if (i == 14) {
+			printBinarySequence(bsCopy);
+			printf(" (copy)\n");
+			bscat(bsCopy, bs);
+			printBinarySequence(bsCopy);
+			printf(" (copy)\n");
+		}
 	}
 
 	freeBinarySequence(bs);

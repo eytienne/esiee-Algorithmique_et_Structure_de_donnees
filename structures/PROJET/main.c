@@ -119,8 +119,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		FILE *dest = stdout;
-		ht = uncompress(dest, output_filename);
-		fclose(dest);
+		ht = uncompress(dest, filename);
+		printf("\n");
+		// fclose(dest);
 	} else {
 		fprintf(stderr,
 				"hzip: '%s' is not a hzip command. See 'hzip --help'.\n",

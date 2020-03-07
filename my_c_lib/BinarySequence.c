@@ -6,6 +6,19 @@
 
 enum DIRECTION { ZERO, ONE };
 
+void __fprintBinary(const unsigned char *restrict ptr, size_t size,
+					FILE *restrict stream) {
+	for (size_t i = 0; i < size; i++) {
+		fprintf(stream, "%hhu", ((ptr[i / 8] >> (i % 8)) & 1) != 0);
+		if ((i + 1) % 8 == 0)
+			fprintf(stream, " ");
+	}
+}
+
+void __printBinary(const unsigned char *restrict ptr, size_t size) {
+	__fprintBinary(ptr, size, stdout);
+}
+
 BinarySequence *newBinarySequence() {
 	BinarySequence *newOne = malloc(sizeof(BinarySequence));
 	newOne->bits = NULL;
@@ -28,7 +41,7 @@ BinarySequence *bscpy(BinarySequence *dest, const BinarySequence *src) {
 }
 
 BinarySequence *bscat(BinarySequence *dest, const BinarySequence *src) {
-	for (size_t i = 0; i < src->length; i++)
+	for (size_t i = 0; i < src->length; i++) {
 		switch (getBit(src, i)) {
 		case ONE:
 			addOne(dest);
@@ -36,10 +49,11 @@ BinarySequence *bscat(BinarySequence *dest, const BinarySequence *src) {
 		case ZERO:
 			addZero(dest);
 		}
+	}
 	return dest;
 }
 
-void __goTo(BinarySequence *bs, enum DIRECTION d) {
+void __add(BinarySequence *bs, enum DIRECTION d) {
 	size_t i = bs->length / 8;
 	if (bs->length % 8 == 0) {
 		unsigned char *newBits = realloc(bs->bits, i + 1);
@@ -47,16 +61,17 @@ void __goTo(BinarySequence *bs, enum DIRECTION d) {
 		bs->bits = newBits;
 		bs->bits[i] = 0;
 	}
-	bs->bits[i] = (bs->bits[i]) | (d << bs->length % 8);
+	unsigned char mask = (d << bs->length % 8);
+	bs->bits[i] |= mask;
 	bs->length++;
 }
 
 void addZero(BinarySequence *bs) {
-	__goTo(bs, ZERO);
+	__add(bs, ZERO);
 }
 
 void addOne(BinarySequence *bs) {
-	__goTo(bs, ONE);
+	__add(bs, ONE);
 }
 
 void shorten(BinarySequence *bs) {
@@ -67,7 +82,8 @@ void shorten(BinarySequence *bs) {
 		assert(newBits != NULL);
 		bs->bits = newBits;
 	} else {
-		bs->bits[i] &= 255 >> (8 - (bs->length) % 8);
+		unsigned char mask = 255 >> (9 - (bs->length % 8));
+		bs->bits[i] &= mask;
 	}
 	bs->length--;
 }
@@ -83,9 +99,11 @@ void printBinarySequence(const BinarySequence *bs) {
 }
 
 void fprintBinarySequence(const BinarySequence *bs, FILE *restrict stream) {
+	__fprintBinary(bs->bits, bs->length, stream);
+	return;
 	for (size_t i = 0; i < bs->length; i++) {
 		fprintf(stream, "%hhu", getBit(bs, i));
 		if ((i + 1) % 8 == 0)
-			printf(" ");
+			fprintf(stream, " ");
 	}
 }

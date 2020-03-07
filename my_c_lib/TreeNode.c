@@ -29,7 +29,7 @@ int __freeTree(TreeNode *tn, void *buffer) {
 }
 
 void freeTreeNode(TreeNode *tn, void (*freeValue)(void *value)) {
-	transform(tn, POSTFIXE, __freeTree, freeValue);
+	transform(tn, POSTFIX, __freeTree, freeValue);
 }
 
 int isLeaf(const TreeNode *t) {
@@ -77,7 +77,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 		if (cur == NULL)
 			continue;
 		switch (p) {
-		case PREFIXE: {
+		case PREFIX: {
 			while (!isSSEmpty(parents) && !isParent(cur, top(parents))) {
 				unsstack(parents);
 				if (!isSSEmpty(parents))
@@ -97,7 +97,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 			sstack(toVisit, cur->right);
 			sstack(toVisit, cur->left);
 			break;
-		case INFIXE:
+		case INFIX:
 			// left angle
 			if (cur->left == NULL) {
 				walkResult = function(cur, buffer, bs);
@@ -124,7 +124,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 				sstack(toVisit, cur->left);
 			}
 			break;
-		case POSTFIXE:
+		case POSTFIX:
 			walkResult = postfixWalk_rec(cur, function, buffer);
 			break;
 		default:

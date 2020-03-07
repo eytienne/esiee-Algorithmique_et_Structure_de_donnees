@@ -30,7 +30,7 @@ int __pickLeaves(const TreeNode *t, void *buffer, const BinarySequence *bs) {
 Vector *pickLeaves(TreeNode *root) {
 	Vector *leaves = newVector(sizeof(int*));
 	printf("LEAVES : %p\n", leaves);
-	walkExpert(root, PREFIXE, __pickLeaves, leaves);
+	walkExpert(root, PREFIX, __pickLeaves, leaves);
 	printf("LEAVES (%d, %d): %p\n", size(leaves), capacity(leaves), leaves);
 	return leaves;
 }

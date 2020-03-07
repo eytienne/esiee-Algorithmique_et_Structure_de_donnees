@@ -19,7 +19,7 @@ void printHuffmanPair(const HuffmanPair *hp) {
 }
 
 void printHuffmanTree(const HuffmanTree ht) {
-	walkExpert(ht, PREFIXE, prefixPrint, printHuffmanPair);
+	walkExpert(ht, PREFIX, prefixPrint, printHuffmanPair);
 }
 void freeHuffmanCode(HuffmanCode *hc) {
 	freeBinarySequence(hc->code);
@@ -41,11 +41,12 @@ int __pickLeaves(const TreeNode *t, void *buffer, const BinarySequence *bs) {
 }
 
 /**
+ * INFIX traversal
  * @return : Vector of HuffmanCode
  */
 Vector *pickLeaves(const TreeNode *root) {
 	Vector *leaves = newVector(sizeof(HuffmanCode));
-	walkExpert(root, INFIXE, __pickLeaves, leaves);
+	walkExpert(root, INFIX, __pickLeaves, leaves);
 	return leaves;
 }
 
@@ -111,9 +112,9 @@ typedef struct TraversalInfo {
 int __getTraversal(const TreeNode *tn, void *buffer, const BinarySequence *bs) {
 	const HuffmanPair *hp = tn->value;
 	TraversalInfo *ti = buffer;
-	printf("('%c' %d, code :", hp->c, hp->count);
-	printBinarySequence(bs);
-	printf(")\n");
+	// printf("('%c' %d, code :", hp->c, hp->count);
+	// printBinarySequence(bs);
+	// printf(")\n");
 	if (ti->last < bs->length)
 		for (int i = ti->last; i < bs->length; i++)
 			addZero(ti->traversal);
@@ -185,8 +186,8 @@ HuffmanTree compress(FILE *src, char *filename) {
 	// if (0) {
 	FILE *output_stream = fopen(filename, "w");
 
-	fprintf(output_stream, "%lu", sizeOfText);
-	fprintf(output_stream, "%hhu", sizeOfTable);
+	fwrite(&sizeOfText, sizeof(size_t), 1, output_stream);
+	fwrite(&sizeOfTable, sizeof(unsigned char), 1, output_stream);
 
 	BinarySequence *codes[ASCII_TABLE_SIZE] = {NULL};
 	Vector *leaves = pickLeaves(huffmanHeap);
@@ -195,10 +196,13 @@ HuffmanTree compress(FILE *src, char *filename) {
 		fputc(cur->c, output_stream);
 		codes[cur->c] = cur->code;
 	}
+
 	TraversalInfo ti = {0, newBinarySequence()};
-	walkExpert(huffmanHeap, INFIXE, __getTraversal, &ti);
-	printBinarySequence(ti.traversal);
-	printf("\n");
+	walkExpert(huffmanHeap, INFIX, __getTraversal, &ti);
+
+	// printBinarySequence(ti.traversal);
+	// printf("\n");
+
 	addOne(ti.traversal);
 	int bytesToCopy =
 		ti.traversal->length / 8 + (ti.traversal->length % 8 != 0);
@@ -218,25 +222,130 @@ HuffmanTree compress(FILE *src, char *filename) {
 			if (toWrite->length * 8 >= BUFSIZ) {
 				BinarySequence *reset = newBinarySequence();
 				int flushed = toWrite->length / 8;
-				fwrite(toWrite->bits, sizeof(unsigned char), flushed,
-					   output_stream);
+				size_t written = fwrite(toWrite->bits, sizeof(unsigned char),
+										flushed, output_stream);
+				printf("(written %lu)\n", written);
+				reset->length = toWrite->length % 8;
 				if (toWrite->length % 8 != 0) {
-					reset->length = toWrite->length % 8;
 					reset->bits[0] = toWrite->bits[flushed];
 				}
 				freeBinarySequence(toWrite);
 				toWrite = reset;
 			}
+			printBinarySequence(toWrite);
+			printf("\n");
 			++j;
 		}
 	}
-	fwrite(toWrite->bits, sizeof(unsigned char),
-		   toWrite->length / 8 + toWrite->length % 8 != 0, output_stream);
+	size_t written =
+		fwrite(toWrite->bits, sizeof(unsigned char),
+			   toWrite->length / 8 + toWrite->length % 8 != 0, output_stream);
+	printf("(written %lu)\n", written);
+	if (ferror(output_stream))
+		printf("Error Writing to myfile.txt\n");
 	fclose(output_stream);
 	rewind(src);
 	// }
 	return huffmanHeap;
 }
 
+void printByte(unsigned char c) {
+	BinarySequence *bs = newBinarySequence();
+	bs->bits = malloc(1);
+	bs->bits[0] = c;
+	bs->length = 8;
+	printBinarySequence(bs);
+	freeBinarySequence(bs);
+}
+
 HuffmanTree uncompress(FILE *dest, char *filename) {
+	FILE *input_stream = fopen(filename, "r");
+
+	size_t sizeOfText = 0;
+	unsigned char sizeOfTable = 0;
+	fread(&sizeOfText, sizeof(size_t), 1, input_stream);
+	fread(&sizeOfTable, sizeof(unsigned char), 1, input_stream);
+
+	unsigned char *leavesValues = malloc(sizeOfTable + 1);
+	fread(leavesValues, sizeof(unsigned char), sizeOfTable, input_stream);
+	leavesValues[sizeOfTable] = '\0';
+	printf("t:%d'%s'\n", sizeOfTable, leavesValues);
+
+	// huffman tree reconstitution
+
+	unsigned char nonLeaf = '@';
+	ShallowStack *parents = newShallowStack();
+	TreeNode *ht = newTreeNode(&nonLeaf, sizeof(unsigned char), NULL, NULL);
+	sstack(parents, ht);
+	unsigned char charsPut = 0;
+	unsigned char curPath = '\0';
+	while (!feof(input_stream) &&
+		   fread(&curPath, sizeof(unsigned char), 1, input_stream) > 0 &&
+		   !isSSEmpty(parents) && charsPut < sizeOfTable) {
+		for (size_t i = 0; i < 8; i++) {
+			if (isSSEmpty(parents) || charsPut >= sizeOfTable)
+				break;
+			if (curPath & (1 << i)) {
+				TreeNode *cur = (TreeNode *)unsstack(parents);
+				if (isLeaf(cur)) {
+					unsigned char *oneLeafValue = malloc(sizeof(unsigned char));
+					*oneLeafValue = leavesValues[charsPut++];
+					cur->value = oneLeafValue;
+				}
+			} else {
+				TreeNode *cur = (TreeNode *)top(parents);
+				if (cur->left == NULL) {
+					cur->left = newTreeNode(&nonLeaf, sizeof(unsigned char),
+											NULL, NULL);
+					sstack(parents, cur->left);
+				} else if (cur->right == NULL) {
+					cur->right = newTreeNode(&nonLeaf, sizeof(unsigned char),
+											 NULL, NULL);
+					sstack(parents, cur->right);
+				} else {
+					printf("INCONSISTENT\n");
+				}
+			}
+		}
+	}
+	free(leavesValues);
+
+	if (charsPut < sizeOfTable) {
+		fprintf(stderr,
+				"Corrupted hzip file: uncomplete encoding table (%d/%d)\n",
+				charsPut, sizeOfTable);
+	}
+
+	size_t decoded = 0;
+	unsigned char buffer[BUFSIZ] = {0};
+	TreeNode *navigator = NULL;
+	while (!feof(input_stream) && decoded < sizeOfText) {
+		fread(buffer, sizeof(unsigned char), BUFSIZ, input_stream);
+		for (size_t i = 0; i < BUFSIZ; i++) {
+			printf("\n");
+			printByte(buffer[i]);
+			printf("\n");
+			unsigned char j = 0;
+			for (; j < 8; j++) {
+				if (navigator == NULL)
+					navigator = ht;
+				int isOne = buffer[i] & (1 << j);
+				if (isOne)
+					navigator = navigator->right;
+				else
+					navigator = navigator->left;
+				if (isLeaf(navigator)) {
+					fputc(*(unsigned char *)navigator->value, dest);
+					decoded++;
+					if (decoded >= sizeOfText)
+						break;
+					navigator = ht;
+				}
+			}
+			if (decoded >= sizeOfText)
+				break;
+		}
+	}
+
+	return ht;
 }

@@ -44,14 +44,14 @@ void freeTree(BSTree *t, void (*freeValue)(void *value)) {
 int countTreeNodes(const BSTree *t) {
 	assert(t != NULL);
 	int counter = 0;
-	walk(t->root, INFIXE, countTreeNodeNodes, &counter);
+	walk(t->root, INFIX, countTreeNodeNodes, &counter);
 	return counter;
 }
 
 void printTree(const BSTree *t, void (*printer)(const void *value)) {
 	assert(t != NULL);
 	PrintInfo pi = {printer, 1};
-	walk(t->root, INFIXE, printTreeNode, &pi);
+	walk(t->root, INFIX, printTreeNode, &pi);
 	printf("\n");
 }
 
@@ -62,7 +62,7 @@ void printTree2(const BSTree *t, void (*printer)(const void *value)) {
 }
 
 void prefixPrintTree(const BSTree *t, void (*printer)(const void *value)) {
-	walkExpert(t->root, PREFIXE, prefixPrint, printer);
+	walkExpert(t->root, PREFIX, prefixPrint, printer);
 }
 
 void insertIntoTree(BSTree *t, const void *newValue) {
@@ -116,7 +116,7 @@ int isOrdered(const BSTree *t) {
 	CheckInfo ci;
 	ci.last = NULL;
 	ci.cmpFunc = t->nodecmp;
-	int badWalk = walk(t->root, INFIXE, __isOrdered, &ci);
+	int badWalk = walk(t->root, INFIX, __isOrdered, &ci);
 	return badWalk ? ISNOTBST : ISBST;
 }
 
@@ -158,7 +158,7 @@ void **treeSort(void **src, int n, size_t size,
 	si.index = 0;
 	si.size = t->sizeofEach;
 
-	int failed = walk(t->root, INFIXE, __treeSort, &si);
+	int failed = walk(t->root, INFIX, __treeSort, &si);
 
 	void **ret = si.dest;
 	if (failed) {

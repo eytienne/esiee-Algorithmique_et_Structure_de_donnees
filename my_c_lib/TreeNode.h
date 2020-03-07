@@ -10,7 +10,7 @@ typedef struct TreeNode {
 	struct TreeNode *left, *right;
 } TreeNode;
 
-enum PATHWAY { INFIXE, PREFIXE, POSTFIXE };
+enum PATHWAY { INFIX, PREFIX, POSTFIX };
 
 enum WALK_CHECK { WALK_SUCCESS, WALK_FAILURE };
 
