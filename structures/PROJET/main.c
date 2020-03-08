@@ -118,10 +118,10 @@ int main(int argc, char *argv[]) {
 				strcat(output_filename, toConcat);
 			}
 		}
-		FILE *dest = stdout;
+		
+		FILE *dest = fopen(output_filename, "w");
 		ht = uncompress(dest, filename);
-		printf("\n");
-		// fclose(dest);
+		fclose(dest);
 	} else {
 		fprintf(stderr,
 				"hzip: '%s' is not a hzip command. See 'hzip --help'.\n",

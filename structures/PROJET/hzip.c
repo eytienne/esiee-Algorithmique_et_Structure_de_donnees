@@ -199,15 +199,13 @@ HuffmanTree compress(FILE *src, char *filename) {
 
 	TraversalInfo ti = {0, newBinarySequence()};
 	walkExpert(huffmanHeap, INFIX, __getTraversal, &ti);
-
-	// printBinarySequence(ti.traversal);
-	// printf("\n");
-
 	addOne(ti.traversal);
+
+
 	int bytesToCopy =
 		ti.traversal->length / 8 + (ti.traversal->length % 8 != 0);
-	fwrite(ti.traversal->bits, sizeof(unsigned char), bytesToCopy,
-		   output_stream);
+	size_t written = fwrite(ti.traversal->bits, sizeof(unsigned char),
+							bytesToCopy, output_stream);
 	rewind(src);
 
 	BinarySequence *toWrite = newBinarySequence();
@@ -227,20 +225,18 @@ HuffmanTree compress(FILE *src, char *filename) {
 				printf("(written %lu)\n", written);
 				reset->length = toWrite->length % 8;
 				if (toWrite->length % 8 != 0) {
+					reset->bits = malloc(1);
 					reset->bits[0] = toWrite->bits[flushed];
 				}
 				freeBinarySequence(toWrite);
 				toWrite = reset;
 			}
-			printBinarySequence(toWrite);
-			printf("\n");
 			++j;
 		}
 	}
-	size_t written =
-		fwrite(toWrite->bits, sizeof(unsigned char),
-			   toWrite->length / 8 + toWrite->length % 8 != 0, output_stream);
-	printf("(written %lu)\n", written);
+	written = fwrite(toWrite->bits, sizeof(unsigned char),
+					 (toWrite->length / 8) + (toWrite->length % 8 != 0),
+					 output_stream);
 	if (ferror(output_stream))
 		printf("Error Writing to myfile.txt\n");
 	fclose(output_stream);
@@ -269,7 +265,6 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 	unsigned char *leavesValues = malloc(sizeOfTable + 1);
 	fread(leavesValues, sizeof(unsigned char), sizeOfTable, input_stream);
 	leavesValues[sizeOfTable] = '\0';
-	printf("t:%d'%s'\n", sizeOfTable, leavesValues);
 
 	// huffman tree reconstitution
 
@@ -279,10 +274,10 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 	sstack(parents, ht);
 	unsigned char charsPut = 0;
 	unsigned char curPath = '\0';
-	while (!feof(input_stream) &&
-		   fread(&curPath, sizeof(unsigned char), 1, input_stream) > 0 &&
-		   !isSSEmpty(parents) && charsPut < sizeOfTable) {
-		for (size_t i = 0; i < 8; i++) {
+	while (charsPut < sizeOfTable && !isSSEmpty(parents) &&
+		   !feof(input_stream)) {
+		fread(&curPath, sizeof(unsigned char), 1, input_stream);
+		for (size_t i = 0; i < 8 && charsPut < sizeOfTable; i++) {
 			if (isSSEmpty(parents) || charsPut >= sizeOfTable)
 				break;
 			if (curPath & (1 << i)) {
@@ -321,12 +316,9 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 	TreeNode *navigator = NULL;
 	while (!feof(input_stream) && decoded < sizeOfText) {
 		fread(buffer, sizeof(unsigned char), BUFSIZ, input_stream);
-		for (size_t i = 0; i < BUFSIZ; i++) {
-			printf("\n");
-			printByte(buffer[i]);
-			printf("\n");
+		for (size_t i = 0; i < BUFSIZ && decoded < sizeOfText; i++) {
 			unsigned char j = 0;
-			for (; j < 8; j++) {
+			for (; j < 8 && decoded < sizeOfText; j++) {
 				if (navigator == NULL)
 					navigator = ht;
 				int isOne = buffer[i] & (1 << j);
@@ -337,13 +329,9 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 				if (isLeaf(navigator)) {
 					fputc(*(unsigned char *)navigator->value, dest);
 					decoded++;
-					if (decoded >= sizeOfText)
-						break;
 					navigator = ht;
 				}
 			}
-			if (decoded >= sizeOfText)
-				break;
 		}
 	}
 

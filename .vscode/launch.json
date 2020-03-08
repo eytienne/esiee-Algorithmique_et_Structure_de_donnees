@@ -9,14 +9,14 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/hzip",
-            // "args": [
-            //     "compress",
-            //     "structures/PROJET/us.txt"
-            // ],
             "args": [
-                "uncompress",
-                "result.hf"
+                "compress",
+                "structures/PROJET/us.txt"
             ],
+            // "args": [
+            //     "uncompress",
+            //     "result.hf"
+            // ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
