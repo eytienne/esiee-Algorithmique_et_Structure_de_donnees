@@ -1,5 +1,7 @@
 runProject: compileProject
-	./hzip compress us.txt
+	./hzip compress us.txt -o result.hf \
+		&& cat result.hf && \
+		./hzip uncompress result.hf && cat result
 
 compileProject:
 	gcc \
