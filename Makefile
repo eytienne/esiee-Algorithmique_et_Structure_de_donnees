@@ -28,10 +28,15 @@ staticCheckProject:
 		structures/PROJET/hzip.c \
 		structures/PROJET/main.c \
 
+valgrindCompress:
+	make -s valgrindProject command="compress us.txt -o result.hf"
+
+valgrindUncompress:
+	make -s valgrindProject command="uncompress result.hf"
+
 valgrindProject: compileProject
 	valgrind --leak-check=full --show-leak-kinds=all --tool=memcheck --num-callers=16 --leak-resolution=high \
-		--main-stacksize=100000000 \
-		./hzip compress --table us.txt
+		./hzip $(command)
 
 testTree:
 	gcc -g -rdynamic \

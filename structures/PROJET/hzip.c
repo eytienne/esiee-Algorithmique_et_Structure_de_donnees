@@ -128,7 +128,7 @@ int __getTraversal(const TreeNode *tn, void *buffer, const BinarySequence *bs) {
 	return WALK_SUCCESS;
 }
 
-HuffmanTree compress(FILE *src, char *filename) {
+HuffmanTree compress(FILE *src, const char *filename) {
 	unsigned char buffer[BUFSIZ] = {0};
 	int counters[ASCII_TABLE_SIZE] = {0};
 	size_t sizeOfText = 0;
@@ -252,7 +252,7 @@ void printByte(unsigned char c) {
 	freeBinarySequence(bs);
 }
 
-HuffmanTree uncompress(FILE *dest, char *filename) {
+HuffmanTree uncompress(FILE *dest, const char *filename) {
 	FILE *input_stream = fopen(filename, "r");
 
 	size_t sizeOfText = 0;
@@ -346,6 +346,6 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 			}
 		}
 	}
-
+	fclose(input_stream);
 	return ht;
 }

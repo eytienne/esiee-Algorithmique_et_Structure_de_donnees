@@ -11,9 +11,9 @@ typedef struct HuffmanPair {
 	unsigned int count;
 } HuffmanPair;
 
-HuffmanTree compress(FILE *src, char *filename);
+HuffmanTree compress(FILE *src, const char *filename);
 
-HuffmanTree uncompress(FILE *dest, char *filename);
+HuffmanTree uncompress(FILE *dest, const char *filename);
 
 void freeHuffmanTree(TreeNode *ht);
 

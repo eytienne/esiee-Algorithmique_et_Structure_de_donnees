@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 				exit(EXIT_FAILURE);
 			}
 			size_t len = strlen(argv[i]);
-			output_filename = malloc(len);
+			output_filename = malloc(len + 1);
 			strcpy(output_filename, argv[i]);
 		} else if (strncmp(argv[i], "--", 2) == 0) {
 			if (strcmp(argv[i] + 2, "help") == 0) {
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
 			} else {
 				size_t len = strlen(filename);
 				const char *toConcat = " (extracted)";
-				output_filename = malloc(len + strlen(toConcat));
+				output_filename = malloc(len + strlen(toConcat) + 1);
 				strcpy(output_filename, filename);
 				output_filename[len] = '\0';
 				strcat(output_filename, toConcat);
