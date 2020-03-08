@@ -90,8 +90,8 @@ void shorten(BinarySequence *bs) {
 
 int getBit(const BinarySequence *bs, size_t index) {
 	assert(index >= 0);
-	assert(index < (bs->length / 8 + (bs->length % 8 != 0)) * 8);
-	return ((bs->bits[index / 8] >> (index % 8)) & 1) != 0;
+	assert(index / 8 <= bs->length / 8 && bs->length > 0);
+	return (bs->bits[index / 8] & (1 << (index % 8))) != 0;
 }
 
 void printBinarySequence(const BinarySequence *bs) {

@@ -15,6 +15,8 @@ HuffmanTree compress(FILE *src, char *filename);
 
 HuffmanTree uncompress(FILE *dest, char *filename);
 
+void freeHuffmanTree(TreeNode *ht);
+
 void printHuffmanTree(const HuffmanTree ht);
 
 void printHuffmanTable(const HuffmanTree ht);

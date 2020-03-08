@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/hzip",
             "args": [
                 "compress",
-                "structures/PROJET/us.txt"
+                "us.txt"
             ],
             // "args": [
             //     "uncompress",

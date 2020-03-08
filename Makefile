@@ -1,5 +1,5 @@
 runProject: compileProject
-	./hzip compress structures/PROJET/us.txt
+	./hzip compress us.txt
 
 compileProject:
 	gcc \
@@ -30,7 +30,8 @@ staticCheckProject:
 
 valgrindProject: compileProject
 	valgrind --leak-check=full --show-leak-kinds=all --tool=memcheck --num-callers=16 --leak-resolution=high \
-		./hzip compress --table structures/PROJET/us.txt
+		--main-stacksize=100000000 \
+		./hzip compress --table us.txt
 
 testTree:
 	gcc -g -rdynamic \

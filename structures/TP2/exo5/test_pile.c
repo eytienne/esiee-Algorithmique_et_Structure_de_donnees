@@ -34,6 +34,7 @@ int main() {
 	assert(isSSEmpty(pile));
 
 	printf("Tests passed!\n");
+	freeShallowStack(pile);
 
 	return EXIT_SUCCESS;
 }

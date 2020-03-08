@@ -78,7 +78,8 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 			continue;
 		switch (p) {
 		case PREFIX: {
-			while (!isSSEmpty(parents) && !isParent(cur, top(parents))) {
+			while (!isSSEmpty(parents) &&
+				   !isParent(cur, (const TreeNode *)top(parents))) {
 				unsstack(parents);
 				if (!isSSEmpty(parents))
 					shorten(bs);
@@ -106,7 +107,7 @@ int walkExpert(const TreeNode *root, enum PATHWAY p,
 				while (cur->right == NULL && !isSSEmpty(toProcess)) {
 					cur = unsstack(toProcess);
 					while (!isSSEmpty(parents) &&
-						   !isParent(cur, top(parents))) {
+						   !isParent(cur, (const TreeNode *)top(parents))) {
 						unsstack(parents);
 						shorten(bs);
 					}

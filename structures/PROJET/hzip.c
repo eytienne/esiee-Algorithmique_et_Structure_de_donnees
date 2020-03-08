@@ -21,9 +21,14 @@ void printHuffmanPair(const HuffmanPair *hp) {
 void printHuffmanTree(const HuffmanTree ht) {
 	walkExpert(ht, PREFIX, prefixPrint, printHuffmanPair);
 }
+
 void freeHuffmanCode(HuffmanCode *hc) {
 	freeBinarySequence(hc->code);
 	free(hc);
+}
+
+void freeHuffmanTree(TreeNode *ht) {
+	freeTreeNode(ht, NULL);
 }
 
 int __pickLeaves(const TreeNode *t, void *buffer, const BinarySequence *bs) {
@@ -120,6 +125,7 @@ int __getTraversal(const TreeNode *tn, void *buffer, const BinarySequence *bs) {
 			addOne(ti->traversal);
 	}
 	ti->last = bs->length;
+	return WALK_SUCCESS;
 }
 
 HuffmanTree compress(FILE *src, char *filename) {
@@ -188,6 +194,7 @@ HuffmanTree compress(FILE *src, char *filename) {
 		fputc(cur->c, output_stream);
 		codes[cur->c] = cur->code;
 	}
+	freeVector(leaves, NULL);
 
 	TraversalInfo ti = {0, newBinarySequence()};
 	walkExpert(huffmanHeap, INFIX, __getTraversal, &ti);
@@ -197,6 +204,7 @@ HuffmanTree compress(FILE *src, char *filename) {
 		ti.traversal->length / 8 + (ti.traversal->length % 8 != 0);
 	fwrite(ti.traversal->bits, sizeof(unsigned char), bytesToCopy,
 		   output_stream);
+	freeBinarySequence(ti.traversal);
 	rewind(src);
 
 	BinarySequence *toWrite = newBinarySequence();
@@ -226,8 +234,10 @@ HuffmanTree compress(FILE *src, char *filename) {
 	}
 	fwrite(toWrite->bits, sizeof(unsigned char),
 		   (toWrite->length / 8) + (toWrite->length % 8 != 0), output_stream);
-	if (ferror(output_stream))
-		printf("Error Writing to myfile.txt\n");
+	freeBinarySequence(toWrite);
+	for (unsigned short i = 0; i < ASCII_TABLE_SIZE; i++)
+		if (codes[i] != NULL)
+			freeBinarySequence(codes[i]);
 	fclose(output_stream);
 	rewind(src);
 	return huffmanHeap;
@@ -293,6 +303,7 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 		}
 	}
 	free(leavesValues);
+	freeShallowStack(parents);
 
 	if (charsPut < sizeOfTable) {
 		fprintf(stderr,

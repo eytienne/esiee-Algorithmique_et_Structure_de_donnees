@@ -57,7 +57,9 @@ int main(int argc, char *argv[]) {
 						argv[i]);
 				exit(EXIT_FAILURE);
 			}
-			output_filename = argv[i];
+			size_t len = strlen(argv[i]);
+			output_filename = malloc(len);
+			strcpy(output_filename, argv[i]);
 		} else if (strncmp(argv[i], "--", 2) == 0) {
 			if (strcmp(argv[i] + 2, "help") == 0) {
 				printHelp();
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]) {
 		FILE *src = fopen(filename, "r");
 		if (output_filename == NULL) {
 			size_t len = strlen(filename);
-			output_filename = malloc(len + strlen(HZIP_EXTENSION));
+			output_filename = malloc(len + strlen(HZIP_EXTENSION) + 1);
 			strcpy(output_filename, filename);
 			strcat(output_filename, HZIP_EXTENSION);
 		}
@@ -107,8 +109,9 @@ int main(int argc, char *argv[]) {
 			char *ext = strstr(filename, HZIP_EXTENSION);
 			if (ext != NULL) {
 				size_t len = ext - filename;
-				output_filename = malloc(len);
+				output_filename = malloc(len + 1);
 				strncpy(output_filename, filename, len);
+				output_filename[len] = '\0';
 			} else {
 				size_t len = strlen(filename);
 				const char *toConcat = " (extracted)";
@@ -118,7 +121,7 @@ int main(int argc, char *argv[]) {
 				strcat(output_filename, toConcat);
 			}
 		}
-		
+
 		FILE *dest = fopen(output_filename, "w");
 		ht = uncompress(dest, filename);
 		fclose(dest);
@@ -141,6 +144,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	freeTreeNode(ht, NULL);
+	freeHuffmanTree(ht);
+	free(output_filename);
 	return 0;
 }
