@@ -4,6 +4,6 @@
 
 `make -s compileProject`
 
-`hzip --help`
+`./hzip --help`
 
 ![](https://media.giphy.com/media/7Q7SqFSRmzkFq/giphy.gif)
