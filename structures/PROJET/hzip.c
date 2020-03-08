@@ -112,9 +112,6 @@ typedef struct TraversalInfo {
 int __getTraversal(const TreeNode *tn, void *buffer, const BinarySequence *bs) {
 	const HuffmanPair *hp = tn->value;
 	TraversalInfo *ti = buffer;
-	// printf("('%c' %d, code :", hp->c, hp->count);
-	// printBinarySequence(bs);
-	// printf(")\n");
 	if (ti->last < bs->length)
 		for (int i = ti->last; i < bs->length; i++)
 			addZero(ti->traversal);
@@ -135,12 +132,10 @@ HuffmanTree compress(FILE *src, char *filename) {
 		for (; i < BUFSIZ; i++) {
 			if (buffer[i] == '\0')
 				break;
-			printf("%c", buffer[i]);
 			counters[buffer[i]]++;
 		}
 		sizeOfText += i;
 	}
-	printf("\n----------------------\n");
 
 	Vector *v = newVector(sizeof(HuffmanPair));
 	for (unsigned int i = 0; i < ASCII_TABLE_SIZE; i++) {
@@ -152,7 +147,6 @@ HuffmanTree compress(FILE *src, char *filename) {
 	unsigned char sizeOfTable = size(v);
 
 	qsort(v->values, size(v), sizeof(void *), huffman_pair_cmp);
-	// printVectorOfHP(v);
 	HuffmanPair **values = (HuffmanPair **)v->values;
 
 	PriorityQueue *pq = newPriorityQueue(sizeof(TreeNode));
@@ -163,7 +157,6 @@ HuffmanTree compress(FILE *src, char *filename) {
 		free(toAdd);
 	}
 	freeVector(v, NULL);
-	// printPQ(pq);
 
 	TreeNode *huffmanHeap = NULL;
 	while (!isPQEmpty(pq)) {
@@ -183,7 +176,6 @@ HuffmanTree compress(FILE *src, char *filename) {
 	}
 	freePriorityQueue(pq, NULL);
 
-	// if (0) {
 	FILE *output_stream = fopen(filename, "w");
 
 	fwrite(&sizeOfText, sizeof(size_t), 1, output_stream);
@@ -201,11 +193,10 @@ HuffmanTree compress(FILE *src, char *filename) {
 	walkExpert(huffmanHeap, INFIX, __getTraversal, &ti);
 	addOne(ti.traversal);
 
-
 	int bytesToCopy =
 		ti.traversal->length / 8 + (ti.traversal->length % 8 != 0);
-	size_t written = fwrite(ti.traversal->bits, sizeof(unsigned char),
-							bytesToCopy, output_stream);
+	fwrite(ti.traversal->bits, sizeof(unsigned char), bytesToCopy,
+		   output_stream);
 	rewind(src);
 
 	BinarySequence *toWrite = newBinarySequence();
@@ -220,9 +211,8 @@ HuffmanTree compress(FILE *src, char *filename) {
 			if (toWrite->length * 8 >= BUFSIZ) {
 				BinarySequence *reset = newBinarySequence();
 				int flushed = toWrite->length / 8;
-				size_t written = fwrite(toWrite->bits, sizeof(unsigned char),
-										flushed, output_stream);
-				printf("(written %lu)\n", written);
+				fwrite(toWrite->bits, sizeof(unsigned char), flushed,
+					   output_stream);
 				reset->length = toWrite->length % 8;
 				if (toWrite->length % 8 != 0) {
 					reset->bits = malloc(1);
@@ -234,14 +224,12 @@ HuffmanTree compress(FILE *src, char *filename) {
 			++j;
 		}
 	}
-	written = fwrite(toWrite->bits, sizeof(unsigned char),
-					 (toWrite->length / 8) + (toWrite->length % 8 != 0),
-					 output_stream);
+	fwrite(toWrite->bits, sizeof(unsigned char),
+		   (toWrite->length / 8) + (toWrite->length % 8 != 0), output_stream);
 	if (ferror(output_stream))
 		printf("Error Writing to myfile.txt\n");
 	fclose(output_stream);
 	rewind(src);
-	// }
 	return huffmanHeap;
 }
 
@@ -268,9 +256,10 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 
 	// huffman tree reconstitution
 
-	unsigned char nonLeaf = '@';
+	HuffmanPair nonLeaf = {'@', 0};
+
 	ShallowStack *parents = newShallowStack();
-	TreeNode *ht = newTreeNode(&nonLeaf, sizeof(unsigned char), NULL, NULL);
+	TreeNode *ht = newTreeNode(&nonLeaf, sizeof(HuffmanPair), NULL, NULL);
 	sstack(parents, ht);
 	unsigned char charsPut = 0;
 	unsigned char curPath = '\0';
@@ -283,19 +272,19 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 			if (curPath & (1 << i)) {
 				TreeNode *cur = (TreeNode *)unsstack(parents);
 				if (isLeaf(cur)) {
-					unsigned char *oneLeafValue = malloc(sizeof(unsigned char));
-					*oneLeafValue = leavesValues[charsPut++];
-					cur->value = oneLeafValue;
+					HuffmanPair *curValue = cur->value;
+					assert(curValue != NULL);
+					curValue->c = leavesValues[charsPut++];
 				}
 			} else {
 				TreeNode *cur = (TreeNode *)top(parents);
 				if (cur->left == NULL) {
-					cur->left = newTreeNode(&nonLeaf, sizeof(unsigned char),
-											NULL, NULL);
+					cur->left =
+						newTreeNode(&nonLeaf, sizeof(HuffmanPair), NULL, NULL);
 					sstack(parents, cur->left);
 				} else if (cur->right == NULL) {
-					cur->right = newTreeNode(&nonLeaf, sizeof(unsigned char),
-											 NULL, NULL);
+					cur->right =
+						newTreeNode(&nonLeaf, sizeof(HuffmanPair), NULL, NULL);
 					sstack(parents, cur->right);
 				} else {
 					printf("INCONSISTENT\n");
@@ -326,11 +315,23 @@ HuffmanTree uncompress(FILE *dest, char *filename) {
 					navigator = navigator->right;
 				else
 					navigator = navigator->left;
+				HuffmanPair *navigatorValue = navigator->value;
 				if (isLeaf(navigator)) {
-					fputc(*(unsigned char *)navigator->value, dest);
+					fputc(navigatorValue->c, dest);
+					navigatorValue->count++;
 					decoded++;
 					navigator = ht;
 				}
+				// as postfix at the end
+				// else {
+				// 	navigatorValue->count =
+				// 		(navigator->left
+				// 			 ? ((HuffmanPair *)navigator->left->value)->count
+				// 			 : 0) +
+				// 		(navigator->right
+				// 			 ? ((HuffmanPair *)navigator->right->value)->count
+				// 			 : 0);
+				// }
 			}
 		}
 	}
